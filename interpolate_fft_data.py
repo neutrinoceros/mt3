@@ -12,8 +12,19 @@ data[:,0]=data[:,0]-data[0,0]
 #data[:,3] : Formal uncertainty of celestial pole offset dX
 #data[:,4] : Formal uncertainty of celestial pole offset dY
 
+
+#trying to kill some aberant point
+dX_array=data[:,1] 
+dY_array=data[:,2]
+dX_array=dX_array-np.average(dX_array)
+dY_array=dY_array-np.average(dY_array)
+
+
+
+
+
 #sample step
-sample_step=3 #days
+sample_step=7 #days
 
 #final time to interpolate the time
 final_time=(int(data[-1,0]/sample_step)+1)*sample_step
@@ -22,18 +33,13 @@ final_time=(int(data[-1,0]/sample_step)+1)*sample_step
 
 #interpolation of data
 interpolated_time=np.arange(0,final_time+sample_step,float(sample_step))
-print "dernier temps interpoller",interpolated_time[-1] 
-print "longeur tab intrerpoller",len(interpolated_time)
-print "temps final / sample",final_time*1./sample_step
-print "tab temp interpole", interpolated_time
-interpolated_dX=np.interp(interpolated_time,data[:,0],data[:,1])
-interpolated_dY=np.interp(interpolated_time,data[:,0],data[:,2])
+# print "dernier temps interpoller",interpolated_time[-1] 
+# print "longeur tab intrerpoller",len(interpolated_time)
+# print "temps final / sample",final_time*1./sample_step
+# print "tab temp interpole", interpolated_time
+interpolated_dX=np.interp(interpolated_time,data[:,0],dX_array)
+interpolated_dY=np.interp(interpolated_time,data[:,0],dY_array)
 
-
-#checking plot
-# plt.plot(data[:,0],data[:,1],'b')
-# plt.plot(interpolated_time,interpolated_dX,'r x')
-# plt.show()
 
 
 # complex fast fourier transform normalized
@@ -49,10 +55,18 @@ Mod_fft_dY=np.abs(Cplx_fft_dY[0:len(Cplx_fft_dY)/2])*2
 axe_f=fftp.fftfreq(len(interpolated_time),sample_step)
 
 
-# ploting result
-plt.plot(axe_f[0:len(Mod_fft_dX)],Mod_fft_dX,label='nutation dX')
-plt.plot(axe_f[0:len(Mod_fft_dX)],Mod_fft_dY,label='nutation dY')
+# # ploting result
+plt.plot(1./axe_f[0:len(Mod_fft_dX)],Mod_fft_dX,label='nutation dX')
+plt.plot(1./axe_f[0:len(Mod_fft_dX)],Mod_fft_dY,label='nutation dY')
 plt.xlabel('frequence 1/jour')
 plt.ylabel('puissance normalise')
+# plt.legend(loc='best')
+
+#checking plot
+# plt.plot(data[:,0],data[:,1],'b')
+# plt.plot(interpolated_time,interpolated_dX,label='dX')
+# plt.plot(interpolated_time,interpolated_dY,label='dY')
 plt.legend(loc='best')
+
+
 plt.show()
