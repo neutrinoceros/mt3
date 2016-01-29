@@ -11,12 +11,24 @@
 #======================================================================    
 
 import numpy as np
+import numpy.ma as ma
 import pylab as pl
 
 
 #======================================================================    
 #                           functions def
 #======================================================================    
+
+def get_mask(signal) :
+    #finds invalid values in the signal and return the corresponding mask
+
+    mask = []
+    for i in range(len(signal)) :
+        if signal[i] == 0.0 :
+            mask.append(1)
+        else :
+            mask.append(0)
+    return mask
 
 
 def set_zeros2ones(w) :
@@ -40,30 +52,33 @@ def comp_mean(xdata,ydata,ysigma,tmin,h=7.0) :
     ymean = a/2 * (h + 2*tmin) + b
     return ymean
 
+
 def ponderateur(t,N,o,p) :
     #arbitrary weight function
     return N*np.sin(t*o+p)
 
 
-def comp_mean2(xdata,ydata,ysigma,tmin,h=7.0) :
+def comp_mean2(time,xdata,xsigma,tmin,h=7.0) :
     #this second method computes mean value at the middle of the interval to be closer to y values 
     #known near this date than to y values known at the interval's boundaries
 
+    t    = np.array(time)
     x    = np.array(xdata)
-    y    = np.array(ydata)
     om   = np.pi/h
     phi  = tmin*om
     Norm = np.pi/h *(np.cos(om*tmin+phi) - np.cos(om*(tmin+h)+phi))
-    w = np.array(ysigma)
+    om = 2.*np.pi/h
+    
+    w = np.array(xsigma)
     set_zeros2ones(w)
     w = w**-2
     w *= ponderateur(x,Norm,om,phi)
-    
-    ymean = np.sum(y*w)/np.sum(w)
-    return ymean
+
+    xmean = np.sum(x*w)/np.sum(w)
+    return xmean
 
 
-def get_mean_signal(time,xpol,ypol,sigxpol,sigypol,step=7.,ignore=200,method=1) :
+def get_mean_signal(time,xpol,sigxpol,mask,step=20.,ignore=200,method=2) :
     #computes mean signal for x and y at the same time according to one method or the other
     #ignore is used to avoid difficulties encountered for oldest data points when low sampling rates 
     #did not allow avering over short periods of time
@@ -73,38 +88,52 @@ def get_mean_signal(time,xpol,ypol,sigxpol,sigypol,step=7.,ignore=200,method=1) 
     elif method == 2 :
         cm = comp_mean2
 
+    mtime     = ma.masked_array(time,mask)
+    mxpol     = ma.masked_array(xpol,mask)
+    msigxpol  = ma.masked_array(sigxpol,mask)
+    
+    #only take non masked values
+    mtime    = mtime[~mtime.mask]
+    mxpol    = mxpol[~mxpol.mask]
+    msigxpol = msigxpol[~msigxpol.mask]
+
     tmean = []
     xmean = []
     ymean = []
-    tmin = time[ignore]
+    tmin  = mtime[ignore]
+
     i = 0
-    while tmin+step <= time[-1] :
-        tdata,xdata,xsigma,ydata,ysigma = [],[],[],[],[]
-        while time[i] < tmin + step :
-            tdata.append(time[i])
-            xdata.append(xpol[i])
-            xsigma.append(sigxpol[i])
-            ydata.append(ypol[i])
-            ysigma.append(sigypol[i])
+    while mtime[i] < tmin :
+        i += 1
+    while tmin+step <= mtime[-1] :
+        tdata,xdata,xsigma = [],[],[]
+        while mtime[i] < tmin + step :
+            tdata.append(mtime[i])
+            xdata.append(mxpol[i])
+            xsigma.append(msigxpol[i])
             i += 1
         tm = tmin + step/2.0
         xm = cm(tdata,xdata,xsigma,tmin,step)
-        ym = cm(tdata,ydata,ysigma,tmin,step)
+ 
         tmean.append(tm)
         xmean.append(xm)
-        ymean.append(ym)
         tmin += step
-    return tmean,xmean,ymean
+    return tmean,xmean
 
 
-def plot_signalVSmean(ax,t,xdata,sigx,tm,xm) :
+def plot_signalVSmean(ax,t,xdata,sigx,tm,xm,mask) :
     #simple plotting function
-    step = tmean[1] - tmean[0]
+    step = tm[1] - tm[0]
+    mt     = ma.masked_array(t,mask)
+    mx     = ma.masked_array(xdata,mask)
+
+
 #    xticks = tm
 #    ax.set_xticks(xticks)
-    ax.errorbar(time,xdata,yerr=sigx,fmt='+',alpha=0.6,markersize=1)
-#    ax.scatter(t,xdata,marker='o',s=1.,alpha=0.6)
-    ax.scatter(tm,xm,s=100,lw=2,marker='+',color='r',alpha=0.8)
+#    ax.errorbar(time,xdata,yerr=sigx,fmt='+',alpha=0.6,markersize=1)
+    ax.scatter(mt,mx,marker='o',s=1.,alpha=0.6)
+#    ax.scatter(tm,xm,s=100,lw=2,marker='+',color='r',alpha=0.8)
+    ax.plot(tm,xm,lw=2,color='r',alpha=0.8)
 
 
 #======================================================================    
@@ -119,16 +148,24 @@ tab      = np.genfromtxt(filename,usecols=(0,4,5,9,10))
 time,xpol,ypol,sigxpol,sigypol = tab[:,0],tab[:,1],tab[:,2],tab[:,3],tab[:,4]
 
 #data processing
-tmean,xmean,ymean = get_mean_signal(time,xpol,ypol,sigxpol,sigypol,step=20.,ignore=200,method=2)
+maskx      = get_mask(xpol)
+masky      = get_mask(ypol)
+tmeanx,xmean = get_mean_signal(time,xpol,sigxpol,maskx,ignore=200,method=2)
+tmeany,ymean = get_mean_signal(time,ypol,sigypol,masky,ignore=200,method=2)
 
 
 #plotting
 pl.ion()
-fig,axes =  pl.subplots(nrows=2)
+fig,axes = pl.subplots(nrows=2)
 
 pl.show()
-plot_signalVSmean(axes[0],time,xpol,sigxpol,tmean,xmean)
-plot_signalVSmean(axes[1],time,ypol,sigypol,tmean,ymean)
+axes[0].set_title("method 2")
+plot_signalVSmean(axes[0],time,xpol,sigxpol,tmeanx,xmean,maskx)
+plot_signalVSmean(axes[1],time,ypol,sigypol,tmeany,ymean,masky)
+
+# mtime     = ma.masked_array(time,maskx)
+# mxpol     = ma.masked_array(xpol,maskx)
+# axes[0].scatter(mtime,xpol,c='m',marker='+',lw=2,alpha=0.3)
 
 
 pl.draw()
