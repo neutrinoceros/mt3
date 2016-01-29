@@ -19,12 +19,14 @@ import pylab as pl
 #                           functions def
 #======================================================================    
 
-def get_mask(signal) :
+def get_mask(signal,err) :
     #finds invalid values in the signal and return the corresponding mask
 
     mask = []
     for i in range(len(signal)) :
-        if signal[i] == 0.0 :
+#        toofar = (np.abs(signal[i]) - 2*err[i] > 0) 
+        toofar = False
+        if signal[i] == 0.0 or toofar:
             mask.append(1)
         else :
             mask.append(0)
@@ -53,9 +55,13 @@ def comp_mean(xdata,ydata,ysigma,tmin,h=7.0) :
     return ymean
 
 
-def ponderateur(t,N,o,p) :
+# def ponderateur(t,N,o,p) :
+#     #arbitrary weight function
+#     return N*np.sin(t*o+p)
+
+def ponderateur(t,om) :
     #arbitrary weight function
-    return N*np.sin(t*o+p)
+    return (1. + np.sin(t*om+3*np.pi/2))
 
 
 def comp_mean2(time,xdata,xsigma,tmin,h=7.0) :
@@ -64,15 +70,17 @@ def comp_mean2(time,xdata,xsigma,tmin,h=7.0) :
 
     t    = np.array(time)
     x    = np.array(xdata)
-    om   = np.pi/h
-    phi  = tmin*om
-    Norm = np.pi/h *(np.cos(om*tmin+phi) - np.cos(om*(tmin+h)+phi))
-    om = 2.*np.pi/h
+    # om   = np.pi/h
+    # phi  = tmin*om
+    # Norm = np.pi/h *(np.cos(om*tmin+phi) - np.cos(om*(tmin+h)+phi))
+
+    om   = 2*np.pi/h
     
     w = np.array(xsigma)
     set_zeros2ones(w)
     w = w**-2
-    w *= ponderateur(x,Norm,om,phi)
+#    w *= ponderateur(x,Norm,om,phi)
+#    w *= ponderateur(x,om)
 
     xmean = np.sum(x*w)/np.sum(w)
     return xmean
@@ -133,7 +141,7 @@ def plot_signalVSmean(ax,t,xdata,sigx,tm,xm,mask) :
 #    ax.errorbar(time,xdata,yerr=sigx,fmt='+',alpha=0.6,markersize=1)
 #    ax.scatter(mt,mx,marker='o',s=1.,alpha=0.6)
 #    ax.scatter(tm,xm,s=100,lw=2,marker='+',color='r',alpha=0.8)
-    ax.plot(tm,xm,lw=2,color='r',alpha=0.8,label=str(step))
+    ax.plot(tm,xm,lw=1,alpha=0.8,label=str(step))
 
 
 #======================================================================    
@@ -153,20 +161,20 @@ fig,axes = pl.subplots(nrows=2)
 pl.show()
 axes[0].set_title("method 2")
 
-maskx      = get_mask(xpol)
-masky      = get_mask(ypol)
-for step in [5.,7.,10.,20.,100.] :
+maskx      = get_mask(xpol,sigxpol)
+masky      = get_mask(ypol,sigypol)
+for step in [15.] :
     #data processing
     tmeanx,xmean = get_mean_signal(time,xpol,sigxpol,maskx,step=step,ignore=200,method=2)
     tmeany,ymean = get_mean_signal(time,ypol,sigypol,masky,step=step,ignore=200,method=2)
 
-
     plot_signalVSmean(axes[0],time,xpol,sigxpol,tmeanx,xmean,maskx)
     plot_signalVSmean(axes[1],time,ypol,sigypol,tmeany,ymean,masky)
 
-# mtime     = ma.masked_array(time,maskx)
-# mxpol     = ma.masked_array(xpol,maskx)
-# axes[0].scatter(mtime,xpol,c='m',marker='+',lw=2,alpha=0.3)
+mtime     = ma.masked_array(time,maskx)
+mxpol     = ma.masked_array(xpol,maskx)
+axes[0].scatter(mtime,xpol,c='m',edgecolor='face',marker='o',s=1,alpha=0.8)
+axes[0].errorbar(mtime,xpol,yerr=sigxpol,fmt='+',alpha=0.6,markersize=1)
 
 pl.legend()
 pl.draw()
