@@ -1,16 +1,31 @@
 program sum_error
 
+!======================================================================    
+! script used to calculate the sum of frequency and phase 
+! using the data in "ondes.txt"
+! 
+! work in progress
+! to do :
+!     * sum of the integer of Delaunay variables multiply by 
+!       Fundamental Argument of Nutation
+!======================================================================    
+
   implicit none
+
+!======================================================================  
+! Variables declaration
+!======================================================================  
+
   integer, parameter :: xi = selected_real_kind (15)
   integer, dimension(:), allocatable :: l,ls,F,D,Om,Me,Ve,Te,Ma,Ju,Sa,Ur,Ne,Pa 
   real (kind=xi), dimension(:), allocatable :: Periode,ReREN, ImREN,ReMHB,ImMHB,ReCOR, &
     ImCOR,ReADD,ImADD,ReRET,ImRET, sigma, phi
   real(kind=xi) :: phil, phils, phiF, phiD, phiomega, &
-    sigmal, sigmals, sigmaF, sigmaD, sigmaomega, lpar1, lpar2, lspar1, lspar2, &
-    Fpar1, Fpar2, Dpar1, Dpar2, omegapar1, omegapar2
+    sigmal, sigmals, sigmaF, sigmaD, sigmaomega, lpar1, lpar2, lpar3, lspar1, lspar2, &
+    lspar3, Fpar1, Fpar2, Fpar3, Dpar1, Dpar2, Dpar3, omegapar1, omegapar2, omegapar3
   character(10) :: Aj
   integer :: i, line=42
-  real (kind=xi), parameter :: pi = 3.14159265359_xi
+  real (kind=xi), parameter :: pi=4._xi*atan(1._xi)
    
   allocate(l(line))
   allocate(ls(line))
@@ -40,41 +55,20 @@ program sum_error
   allocate(sigma(line))
   allocate(phi(line))
 
-  !Parameter of sigma
-  lpar1 = 134.96340251_xi*pi/180._xi
-  lspar1 = (357.52910918_xi*pi/180._xi) - 2*pi
-  Fpar1 = 93.27209062_xi*pi/180._xi
-  Dpar1 = (297.85019547_xi*pi/180._xi) - 2*pi
-  omegapar1 = 125.04455501_xi*pi/180._xi
+  !Define the parameter of Fundamental Argument of Nutation (in radian)
+  !phi.. (phase) equal to constant part of the equation
+  phil = 134.96340251_xi*pi/180._xi
+  phils = (357.52910918_xi*pi/180._xi)
+  phiF = 93.27209062_xi*pi/180._xi
+  phiD = (297.85019547_xi*pi/180._xi)
+  phiomega = 125.04455501_xi*pi/180._xi
 
-  lpar2 =(1717915923.2178_xi/3600._xi)*pi/180._xi
-  lspar2 =(129596581.0481_xi/3600._xi)*pi/180._xi
-  Fpar2 =(1739527262.8478_xi/3600._xi)*pi/180._xi
-  Dpar2 =(1602961601.2090_xi/3600._xi)*pi/180._xi
-  omegapar2 =(6962890.5431_xi/3600._xi)*pi/180._xi
-
-  phil = acos(lpar1)
-  print*, "1"
-  sigmal = lpar2/sin(phil)
-  print*, "2"
-  phils = acos(lspar1)
-  print*, "3"
-  sigmals = lspar2/sin(phils)
-  print*, "4"
-  phiF = acos(Fpar1)
-  print*, "5"
-  sigmaF = Fpar2/sin(phiF)
-  print*, "6"
-  phiD = acos(Dpar1)
-  print*, "7"
-  sigmaD = Dpar2/sin(phiD)
-  print*, "8"
-  phiomega = acos(omegapar1)
-  print*, "9"
-  sigmaomega = omegapar2/sin(phiomega)
-  print*, "10"
-
-  print*, phil, sigmal, phils, sigmals, phiF, sigmaF, phiD, sigmaD, phiomega, sigmaomega
+  !sigma.. (frequency) equal to coeficient of "t" of the equation
+  sigmal =(1717915923.2178_xi/3600._xi)*pi/180._xi
+  sigmals =(129596581.0481_xi/3600._xi)*pi/180._xi
+  sigmaF =(1739527262.8478_xi/3600._xi)*pi/180._xi
+  sigmaD =(1602961601.2090_xi/3600._xi)*pi/180._xi
+  sigmaomega =(-6962890.5431_xi/3600._xi)*pi/180._xi
 
   !Read "ondes.txt" data  
   open (unit=15, file="ondes.txt", status='old')
@@ -85,11 +79,12 @@ program sum_error
     read (15,*) Aj,l(i),ls(i),F(i),D(i),Om(i),Me(i),Ve(i),Te(i),Ma(i),Ju(i), &
     Sa(i),Ur(i),Ne(i),Pa(i),Periode(i),ReREN(i),ImREN(i),ReMHB(i),ImMHB(i),ReCOR(i), &
     ImCOR(i),ReADD(i),ImADD(i),ReRET(i),ImRET(i)
-        
+
+  !Calculate the total frequency and phase      
     sigma(i) = l(i)*sigmal + ls(i)*sigmals + F(i)*sigmaF + D(i)*sigmaD + Om(i)*sigmaomega
     phi(i) = l(i)*phil + ls(i)*phils + F(i)*phiF + D(i)*phiD + Om(i)*phiomega
   end do
-  print*,'12'
   close(15)
 
+  print*, sigma, phi
 end program sum_error
