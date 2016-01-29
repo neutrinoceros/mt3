@@ -131,9 +131,9 @@ def plot_signalVSmean(ax,t,xdata,sigx,tm,xm,mask) :
 #    xticks = tm
 #    ax.set_xticks(xticks)
 #    ax.errorbar(time,xdata,yerr=sigx,fmt='+',alpha=0.6,markersize=1)
-    ax.scatter(mt,mx,marker='o',s=1.,alpha=0.6)
+#    ax.scatter(mt,mx,marker='o',s=1.,alpha=0.6)
 #    ax.scatter(tm,xm,s=100,lw=2,marker='+',color='r',alpha=0.8)
-    ax.plot(tm,xm,lw=2,color='r',alpha=0.8)
+    ax.plot(tm,xm,lw=2,color='r',alpha=0.8,label=str(step))
 
 
 #======================================================================    
@@ -147,27 +147,28 @@ tab      = np.genfromtxt(filename,usecols=(0,4,5,9,10))
 
 time,xpol,ypol,sigxpol,sigypol = tab[:,0],tab[:,1],tab[:,2],tab[:,3],tab[:,4]
 
-#data processing
-maskx      = get_mask(xpol)
-masky      = get_mask(ypol)
-tmeanx,xmean = get_mean_signal(time,xpol,sigxpol,maskx,ignore=200,method=2)
-tmeany,ymean = get_mean_signal(time,ypol,sigypol,masky,ignore=200,method=2)
-
-
 #plotting
 pl.ion()
 fig,axes = pl.subplots(nrows=2)
-
 pl.show()
 axes[0].set_title("method 2")
-plot_signalVSmean(axes[0],time,xpol,sigxpol,tmeanx,xmean,maskx)
-plot_signalVSmean(axes[1],time,ypol,sigypol,tmeany,ymean,masky)
+
+maskx      = get_mask(xpol)
+masky      = get_mask(ypol)
+for step in [5.,7.,10.,20.,100.] :
+    #data processing
+    tmeanx,xmean = get_mean_signal(time,xpol,sigxpol,maskx,step=step,ignore=200,method=2)
+    tmeany,ymean = get_mean_signal(time,ypol,sigypol,masky,step=step,ignore=200,method=2)
+
+
+    plot_signalVSmean(axes[0],time,xpol,sigxpol,tmeanx,xmean,maskx)
+    plot_signalVSmean(axes[1],time,ypol,sigypol,tmeany,ymean,masky)
 
 # mtime     = ma.masked_array(time,maskx)
 # mxpol     = ma.masked_array(xpol,maskx)
 # axes[0].scatter(mtime,xpol,c='m',marker='+',lw=2,alpha=0.3)
 
-
+pl.legend()
 pl.draw()
 pl.ioff()
 
