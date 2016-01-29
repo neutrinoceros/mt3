@@ -1,13 +1,8 @@
-program sum_error
+program sum_freq_phase
 
 !======================================================================    
 ! script used to calculate the sum of frequency and phase 
 ! using the data in "ondes.txt"
-! 
-! work in progress
-! to do :
-!     * sum of the integer of Delaunay variables multiply by 
-!       Fundamental Argument of Nutation
 !======================================================================    
 
   implicit none
@@ -25,6 +20,7 @@ program sum_error
     lspar3, Fpar1, Fpar2, Fpar3, Dpar1, Dpar2, Dpar3, omegapar1, omegapar2, omegapar3
   character(10) :: Aj
   integer :: i, line=42
+  
   real (kind=xi), parameter :: pi=4._xi*atan(1._xi)
    
   allocate(l(line))
@@ -74,7 +70,6 @@ program sum_error
   open (unit=15, file="ondes.txt", status='old')
   read(15,*)
   read(15,*)
-  print*, '11'
   do i=1,42
     read (15,*) Aj,l(i),ls(i),F(i),D(i),Om(i),Me(i),Ve(i),Te(i),Ma(i),Ju(i), &
     Sa(i),Ur(i),Ne(i),Pa(i),Periode(i),ReREN(i),ImREN(i),ReMHB(i),ImMHB(i),ReCOR(i), &
@@ -83,8 +78,36 @@ program sum_error
   !Calculate the total frequency and phase      
     sigma(i) = l(i)*sigmal + ls(i)*sigmals + F(i)*sigmaF + D(i)*sigmaD + Om(i)*sigmaomega
     phi(i) = l(i)*phil + ls(i)*phils + F(i)*phiF + D(i)*phiD + Om(i)*phiomega
+
   end do
   close(15)
 
-  print*, sigma, phi
-end program sum_error
+  deallocate(l)
+  deallocate(ls)
+  deallocate(F)
+  deallocate(D)
+  deallocate(Om)
+  deallocate(Me)
+  deallocate(Ve)
+  deallocate(Te)
+  deallocate(Ma)
+  deallocate(Ju)
+  deallocate(Sa)
+  deallocate(Ur)
+  deallocate(Ne)
+  deallocate(Pa)
+  deallocate(Periode)
+  deallocate(ReREN)
+  deallocate(ImREN)
+  deallocate(ReMHB)
+  deallocate(ImMHB)
+  deallocate(ReCOR)
+  deallocate(ImCOR)
+  deallocate(ReADD)
+  deallocate(ImADD)
+  deallocate(ReRET)
+  deallocate(ImRET)
+  deallocate(sigma)
+  deallocate(phi)
+
+end program sum_freq_phase
