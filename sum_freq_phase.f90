@@ -1,4 +1,4 @@
-module sum_freq_phase
+program sum_freq_phase
 
 !======================================================================    
 ! script used to calculate the sum of frequency and phase 
@@ -110,4 +110,4 @@ module sum_freq_phase
   deallocate(sigma)
   deallocate(phi)
 
-end module sum_freq_phase
+end program sum_freq_phase
