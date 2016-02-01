@@ -46,21 +46,20 @@ Mod_fft_dX=np.abs(Cplx_fft_dX[:Nbr_of_time/2])*2/Nbr_of_time
 Mod_fft_dY=np.abs(Cplx_fft_dY[:Nbr_of_time/2])*2/Nbr_of_time
 
 # frequential axis
-axe_f=fftp.fftfreq(len(interpolated_time),sample_step)
-
+axe_f=np.linspace(0.,1./(2.*sample_step),Nbr_of_time/2)
 
 # # ploting result
-plt.plot(axe_f[0:len(Mod_fft_dX)],Mod_fft_dX,label='nutation dX')
-plt.plot(axe_f[0:len(Mod_fft_dX)],Mod_fft_dY,label='nutation dY')
+plt.plot(1./axe_f,Mod_fft_dX,label='nutation dX')
+# plt.plot(1./axe_f,Mod_fft_dY,label='nutation dY')
 plt.xlabel('frequence 1/jour')
 plt.ylabel('puissance normalise')
-# plt.legend(loc='best')
+plt.legend(loc='best')
 
 #checking plot
 # plt.plot(data[:,0],data[:,1],'b')
 # plt.plot(interpolated_time,interpolated_dX,label='dX')
 # plt.plot(interpolated_time,interpolated_dY,label='dY')
-plt.legend(loc='best')
+# plt.legend(loc='best')
 
 
 plt.show()
