@@ -3,7 +3,7 @@ import scipy as sc
 import scipy.fftpack as fftp
 import matplotlib.pyplot as plt
 
-data =np.genfromtxt("data/opa2015a.eops",usecols=(0,4,5,9,10))
+data=np.genfromtxt("data/opa2015a.eops",usecols=(0,4,5,9,10))
 data[:,0]=data[:,0]-data[0,0]
 #cata contain the result of VLBI session
 #data[:,0] : time in julian days
@@ -20,53 +20,46 @@ dX_array=dX_array-np.average(dX_array)
 dY_array=dY_array-np.average(dY_array)
 
 
-
-
-
 #sample step
 sample_step=7 #days
 
 #final time to interpolate the time
 final_time=(int(data[-1,0]/sample_step)+1)*sample_step
-# print "derniertemps data",data[-1,0]
-# print "final time",final_time
+print "data end",data[-1,0]
+print "final_time",final_time
 
 #interpolation of data
-interpolated_time=np.arange(0,final_time+sample_step,float(sample_step))
-# print "dernier temps interpoller",interpolated_time[-1] 
-# print "longeur tab intrerpoller",len(interpolated_time)
-# print "temps final / sample",final_time*1./sample_step
-# print "tab temp interpole", interpolated_time
+interpolated_time=np.arange(0.,final_time+sample_step,float(sample_step))
 interpolated_dX=np.interp(interpolated_time,data[:,0],dX_array)
 interpolated_dY=np.interp(interpolated_time,data[:,0],dY_array)
-
-
+Nbr_of_time=np.size(interpolated_time)
+print "end of interpolated time",interpolated_time[-1]
+print "nbr of point", Nbr_of_time
 
 # complex fast fourier transform normalized
-Cplx_fft_dX=fftp.fft(interpolated_dX)/np.size(interpolated_dX)
-Cplx_fft_dY=fftp.fft(interpolated_dY)/np.size(interpolated_dY)
+Cplx_fft_dX=fftp.fft(interpolated_dX)
+Cplx_fft_dY=fftp.fft(interpolated_dY)
 
 # fft module processing
 # N.B. the first part of tab is the conjugate of the second part
-Mod_fft_dX=np.abs(Cplx_fft_dX[0:len(Cplx_fft_dX)/2])*2
-Mod_fft_dY=np.abs(Cplx_fft_dY[0:len(Cplx_fft_dY)/2])*2
+Mod_fft_dX=np.abs(Cplx_fft_dX[:Nbr_of_time/2])*2/Nbr_of_time
+Mod_fft_dY=np.abs(Cplx_fft_dY[:Nbr_of_time/2])*2/Nbr_of_time
 
 # frequential axis
-axe_f=fftp.fftfreq(len(interpolated_time),sample_step)
-
+axe_f=np.linspace(0.,1./(2.*sample_step),Nbr_of_time/2)
 
 # # ploting result
-plt.plot(1./axe_f[0:len(Mod_fft_dX)],Mod_fft_dX,label='nutation dX')
-plt.plot(1./axe_f[0:len(Mod_fft_dX)],Mod_fft_dY,label='nutation dY')
+plt.plot(1./axe_f,Mod_fft_dX,label='nutation dX')
+# plt.plot(1./axe_f,Mod_fft_dY,label='nutation dY')
 plt.xlabel('frequence 1/jour')
 plt.ylabel('puissance normalise')
-# plt.legend(loc='best')
+plt.legend(loc='best')
 
 #checking plot
 # plt.plot(data[:,0],data[:,1],'b')
 # plt.plot(interpolated_time,interpolated_dX,label='dX')
 # plt.plot(interpolated_time,interpolated_dY,label='dY')
-plt.legend(loc='best')
+# plt.legend(loc='best')
 
 
 plt.show()
