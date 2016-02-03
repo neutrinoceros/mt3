@@ -30,7 +30,11 @@ lsame.o : lapack/lapack_routine/lsame.f
 xerbla.o : lapack/lapack_routine/xerbla.f
 	$(FC) $(FLAGS) -c $^
 
+lsq : lsq.f90
+	$(FC) $(FLAGS) arg_nut.f90 lsq.f90 -llapack -lblas -o lsq
 
+run: lsq
+	./lsq
 
 ###
 clean:
