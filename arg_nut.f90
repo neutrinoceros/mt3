@@ -27,5 +27,9 @@ module arg_nut
   real(kind=xi), parameter :: sigmaD =(1602961601.2090_xi/3600._xi)*pi/180._xi
   real(kind=xi), parameter :: sigmaomega =(-6962890.5431_xi/3600._xi)*pi/180._xi
 
+  private 
 
+  public :: xi, pi, phil, phils, phiF, phiD, phiomega, sigmal, sigmals, sigmaF, sigmaD, sigmaomega
+
+contains
 end module arg_nut

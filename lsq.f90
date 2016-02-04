@@ -32,8 +32,8 @@ program lsq
 
   integer :: i, j, k, r, s
 
-  double precision, dimension(11960) :: WORK
-  double precision, dimension(11960) :: IPIV
+  real(kind=xi), dimension(11960) :: WORK
+  real(kind=xi), dimension(11960) :: IPIV
   integer :: info
 
 

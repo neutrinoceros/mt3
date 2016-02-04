@@ -2,7 +2,7 @@ FC    = gfortran
 FLAGS = -g -O0
 #FLAGS = -g -O2 -Wall -Wextra -fcheck=all -fbackslash
 
-all: lapack clean
+all: lapack
 
 lapack: dgetri.o dtrti2.o dtrtri.o ieeeck.o ilaenv.o iparmq.o lsame.o xerbla.o
 
@@ -30,9 +30,11 @@ lsame.o : lapack/lapack_routine/lsame.f
 xerbla.o : lapack/lapack_routine/xerbla.f
 	$(FC) $(FLAGS) -c $^
 
-lsq : lsq.f90
-	$(FC) $(FLAGS) arg_nut.f90 lsq.f90 -llapack -lblas -o lsq
+lsq : arg_nut.o lsq.f90 
+	$(FC) $(FLAGS) $^ -llapack -lblas -o lsq
 
+arg_nut.o : arg_nut.f90
+	$(FC) -c $^
 run: lsq
 	./lsq
 
