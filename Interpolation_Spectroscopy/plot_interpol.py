@@ -6,15 +6,18 @@ tab      = np.genfromtxt(filename,usecols=(0,4,5,9,10))
 
 time,xpol,ypol,sigxpol,sigypol = tab[:,0],tab[:,1],tab[:,2],tab[:,3],tab[:,4]
 
+method   = raw_input("Use interpolation method 1 or 2 ? (I don't want to influence your choice but 2 is definitly better)     ")
+while method not in ['1','2'] :
+    method   = raw_input("""I said "1 or 2", that's not so hard a choice, I'll give you another try :      """)
+
+method = int(method)
+
+
 #plotting
 pl.ion()
 fig,axes = pl.subplots(nrows=2)
 pl.show()
 
-method   = raw_input("Use interpolation method 1 or 2 ? (I don't want to influence your choice but 2 is definitly better)     ")
-while method not in [1,2] :
-    method   = raw_input("""I said "1 or 2", that's not so hard a choice, I'll give you another try :      """)
-    
 axes[0].set_title("method {}".format(method))
 
 maskx      = get_mask(xpol,sigxpol)
