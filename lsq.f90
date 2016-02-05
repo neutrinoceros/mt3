@@ -77,24 +77,25 @@ program lsq
 !======================================================================  
 
 !Create a Matrix of parameter sigma and phi with the uncertainty of dX and dY   
-  do j=1,5980
-    do k=1,42
-      M(j,k) = (1/(errdX(j)**2))*cos(sigma(k)*t(j)+phi(k))
-    end do
-    do k=1,42
-      r = 42 + k
-      M(j,r) = -(1/(errdX(j)**2))*sin(sigma(k)*t(j)+phi(k))
-    end do
-  end do
 
+  do j=1,5980
+     do k=1,42
+        M(j,k) = (1.0/(errdX(j)**2))*cos(sigma(k)*t(j)+phi(k))
+     end do
+     do k=1,42
+        r = 42 + k
+        M(j,r) = -(1.0/(errdX(j)**2))*sin(sigma(k)*t(j)+phi(k))
+     end do
+  end do
+  
   do j = 1,5980
     s = 5980 + j
     do k=1,42
-      M(s,k) = (1/(errdY(j)**2))*sin(sigma(k)*t(j)+phi(k))
+      M(s,k) = (1.0/(errdY(j)**2))*sin(sigma(k)*t(j)+phi(k))
     end do
     do k=1,42
       r = 42 + k
-      M(s,r) = (1/(errdY(j)**2))*cos(sigma(k)*t(j)+phi(k))
+      M(s,r) = (1.0/(errdY(j)**2))*cos(sigma(k)*t(j)+phi(k))
     end do
   end do
 
@@ -113,25 +114,18 @@ program lsq
 !  print*, 'M(1,1) = ', M(1,1)
 !  print*, 'M(11960,84) = ', M(11960,84)
 
+
    Q = transpose(M)
 
    MM = matmul(Q,M)
 
-!  do i = 1, 84
-!    do j = 1, 84
-!      MM(i,j) = 0   
-! for each MM(i,j)
-!      do k = 1, 11960  
-! (row i of Q)*(col j of M)
-!        MM(i,j) = MM(i,j) + Q(i,k)*M(k,j)
-!      end do
-!    end do
-!  end do
 
-!Create an inverse Matrix   
-   P = inv(MM)
 
-   i = size(matmul(P,Q))
+!Create an inverse Matrix
+
+!   P = inv(MM)
+
+!   i = size(matmul(P,Q))
 
 !  do i = 1, 84
 !    do j = 1, 11960
