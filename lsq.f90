@@ -85,6 +85,7 @@ program lsq
 !======================================================================  
 
 !Create a Matrix of parameter sigma and phi with the uncertainty of dX and dY   
+
   do j=1,5980
     do k=1,42
       M(j,k) = (1./(errdX(j)**2))*cos(sigma(k)*t(j)+phi(k))
@@ -117,13 +118,13 @@ program lsq
 !  print*, 'M(1,1) = ', M(1,1)
 !  print*, 'M(11960,84) = ', M(11960,84)
 
-!Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
+! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
   Q = transpose(M)  !Transopse the Matrix
   MM = matmul(Q,M)  !Multiply the Matrix
   P = inv(MM) 	    !Inverse the Matrix using function which defined
   MMM = matmul(P,Q)
 
-!Calculate the amplitude
+! Calculate the amplitude
   Ampl = matmul(MMM,dXdY)
   do i=1,42
     s = 42 + i
