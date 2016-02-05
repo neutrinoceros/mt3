@@ -29,6 +29,8 @@ program lsq
   character(20) :: carc
 
   real(kind=xi), dimension(11960,84) :: M, P
+  real(kind=xi), dimension(84,84) :: MM
+  real(kind=xi), dimension(84,11960) :: Q, MMM
 
   integer :: i, j, k, r, s
 
@@ -85,7 +87,7 @@ program lsq
     end do
   end do
 
-  do j = 1,5981
+  do j = 1,5980
     s = 5980 + j
     do k=1,42
       M(s,k) = (1/(errdY(j)**2))*sin(sigma(k)*t(j)+phi(k))
@@ -111,9 +113,38 @@ program lsq
 !  print*, 'M(1,1) = ', M(1,1)
 !  print*, 'M(11960,84) = ', M(11960,84)
 
+   Q = transpose(M)
+
+   MM = matmul(Q,M)
+
+   size(MM)   
+!  do i = 1, 84
+!    do j = 1, 84
+!      MM(i,j) = 0   
+! for each MM(i,j)
+!      do k = 1, 11960  
+! (row i of Q)*(col j of M)
+!        MM(i,j) = MM(i,j) + Q(i,k)*M(k,j)
+!      end do
+!    end do
+!  end do
+
 !Create an inverse Matrix   
-!  P = inv(M)
-  
+   P = inv(MM)
+
+   i = size(matmul(P,Q))
+
+!  do i = 1, 84
+!    do j = 1, 11960
+!      MMM(i,j) = 0   
+! for each MMM(i,j)
+!      do k = 1, 84 
+! (row i of P)*(col j of Q)
+!        MMM(i,j) = MMM(i,j) + P(i,k)*Q(k,j)
+!      end do
+!    end do
+!  end do
+    
   contains 
 
   function inv(A) result(Ainv) ! Define the function for inversing the Matrix
