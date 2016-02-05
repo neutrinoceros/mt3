@@ -117,7 +117,6 @@ program lsq
 
    MM = matmul(Q,M)
 
-   size(MM)   
 !  do i = 1, 84
 !    do j = 1, 84
 !      MM(i,j) = 0   
