@@ -150,7 +150,7 @@ def plot_signalVSmean(ax,t,xdata,sigx,tm,xm,mask) :
 
 
 #data loading
-filename = 'data/opa2015a.eops'
+filename = '../data/opa2015a.eops'
 tab      = np.genfromtxt(filename,usecols=(0,4,5,9,10))
 
 time,xpol,ypol,sigxpol,sigypol = tab[:,0],tab[:,1],tab[:,2],tab[:,3],tab[:,4]
