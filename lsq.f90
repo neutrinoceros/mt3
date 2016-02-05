@@ -25,19 +25,16 @@ program lsq
   character(10) :: Aj
 
   real(kind=xi), dimension(5980) :: t, dX, dY, errdX, errdY, corrdXdY
+  real(kind=xi), dimension(11960) :: dXdY
   real(kind=xi) :: var, exa, exb
   character(20) :: carc
 
-  real(kind=xi), dimension(11960,84) :: M, P
-  real(kind=xi), dimension(84,84) :: MM
+  real(kind=xi), dimension(11960,84) :: M
+  real(kind=xi), dimension(84,84) :: MM, P
   real(kind=xi), dimension(84,11960) :: Q, MMM
-
+  real(kind=xi), dimension(84) :: Ampl
+  real(kind=xi), dimension(42) :: A, B
   integer :: i, j, k, r, s
-
-  real(kind=xi), dimension(11960) :: WORK
-  real(kind=xi), dimension(11960) :: IPIV
-  integer :: info
-
 
 !Read "ondes.txt" data  
   open (unit=15, file="data/ondes.txt", status='old')
@@ -59,13 +56,23 @@ program lsq
     read(10,*)
   end do
   do j=1,5980
-    read (10,*) t(j), var, var, var, var, var, var, var, &
+    read (10,*) t(j), var, var, var, dX(j), dY(j), var, var, &
          carc, errdX(j), errdY(j), carc, var, var, var, corrdXdY(j), &
          var, carc, var, var, var, var, var, var, var, var, &
          var, var, var, var, carc
+    if (errdX(j) .lt. 0.0009) then
+       errdX(j) = 0.0001
+    end if
+    if (errdY(j) .lt. 0.0009) then
+       errdY(j) = 0.0001
+    end if
+    s = 5980 + j
+    dXdY(j) = dX(j)
+    dXdY(s) = dY(j)
   end do
   close(10)
 
+!  print*, size(dX,1)
 !  print*, 'Sigma (1) : ', sigma(1)
 !  print*, 'Phi (1) : ', phi(1)
 !  print*, 't (1) :', t(1)
@@ -79,22 +86,21 @@ program lsq
 !Create a Matrix of parameter sigma and phi with the uncertainty of dX and dY   
   do j=1,5980
     do k=1,42
-      M(j,k) = (1/(errdX(j)**2))*cos(sigma(k)*t(j)+phi(k))
+      M(j,k) = (1./(errdX(j)**2))*cos(sigma(k)*t(j)+phi(k))
     end do
     do k=1,42
       r = 42 + k
-      M(j,r) = -(1/(errdX(j)**2))*sin(sigma(k)*t(j)+phi(k))
+      M(j,r) = -(1./(errdX(j)**2))*sin(sigma(k)*t(j)+phi(k))
     end do
   end do
-
   do j = 1,5980
     s = 5980 + j
     do k=1,42
-      M(s,k) = (1/(errdY(j)**2))*sin(sigma(k)*t(j)+phi(k))
+      M(s,k) = (1./(errdY(j)**2))*sin(sigma(k)*t(j)+phi(k))
     end do
     do k=1,42
       r = 42 + k
-      M(s,r) = (1/(errdY(j)**2))*cos(sigma(k)*t(j)+phi(k))
+      M(s,r) = (1./(errdY(j)**2))*cos(sigma(k)*t(j)+phi(k))
     end do
   end do
 
@@ -103,51 +109,30 @@ program lsq
 !  print*, 't (5980) :', t(5980)
 !  print*, 'Uncertainty of celestial pole offset dX (5980): ', errdX(5980)
 !  print*, 'Uncertainty of celestial pole offset dY (5980): ', errdY(5980)
-
-  exa = (1/(errdX(1)**2))*cos(sigma(1)*t(1)+phi(1))
-  exb = (1/(errdY(5980)**2))*cos(sigma(42)*t(5980)+phi(42))
-  
+!  exa = (1/(errdX(1)**2))*cos(sigma(1)*t(1)+phi(1))
+!  exb = (1/(errdY(5980)**2))*cos(sigma(42)*t(5980)+phi(42))
 !  print*, 'exa = ', exa
 !  print*, 'exb = ', exb
-
 !  print*, 'M(1,1) = ', M(1,1)
 !  print*, 'M(11960,84) = ', M(11960,84)
 
-   Q = transpose(M)
+! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
+  Q = transpose(M)  !Transopse the Matrix
+  MM = matmul(Q,M)  !Multiply the Matrix
+  P = inv(MM) 	    !Inverse the Matrix using function which defined
+  MMM = matmul(P,Q)
 
-   MM = matmul(Q,M)
+! Calculate the amplitude
+  Ampl = matmul(MMM,dXdY)
+  do i=1,42
+    s = 42 + i
+    A(i) = Ampl(i)
+    B(i) = Ampl(s)
+  end do
 
-!  do i = 1, 84
-!    do j = 1, 84
-!      MM(i,j) = 0   
-! for each MM(i,j)
-!      do k = 1, 11960  
-! (row i of Q)*(col j of M)
-!        MM(i,j) = MM(i,j) + Q(i,k)*M(k,j)
-!      end do
-!    end do
-!  end do
-
-!Create an inverse Matrix   
-   P = inv(MM)
-
-   i = size(matmul(P,Q))
-
-!  do i = 1, 84
-!    do j = 1, 11960
-!      MMM(i,j) = 0   
-! for each MMM(i,j)
-!      do k = 1, 84 
-! (row i of P)*(col j of Q)
-!        MMM(i,j) = MMM(i,j) + P(i,k)*Q(k,j)
-!      end do
-!    end do
-!  end do
-    
   contains 
 
-  function inv(A) result(Ainv) ! Define the function for inversing the Matrix
-
+  function inv(A) result(Ainv)
     double precision, dimension(:,:), intent(in) :: A
     double precision, dimension(size(A,1),size(A,2)) :: Ainv
 
@@ -178,7 +163,6 @@ program lsq
     if (info /= 0) then
        stop 'Matrix inversion failed!'
     end if
-
   end function inv
 
 end program lsq
