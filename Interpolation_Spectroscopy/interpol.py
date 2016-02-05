@@ -54,11 +54,6 @@ def comp_mean(xdata,ydata,ysigma,tmin,h=7.0) :
     ymean = a/2 * (h + 2*tmin) + b
     return ymean
 
-
-# def ponderateur(t,N,o,p) :
-#     #arbitrary weight function
-#     return N*np.sin(t*o+p)
-
 def ponderateur(t,om) :
     #arbitrary weight function
     return (1. + np.sin(t*om+3*np.pi/2))
@@ -134,7 +129,6 @@ def plot_signalVSmean(ax,t,xdata,sigx,tm,xm,mask) :
     step = tm[1] - tm[0]
     mt     = ma.masked_array(t,mask)
     mx     = ma.masked_array(xdata,mask)
-
 
 #    xticks = tm
 #    ax.set_xticks(xticks)
