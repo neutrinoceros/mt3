@@ -19,14 +19,14 @@ program lsq
   integer, dimension(42) :: l,ls,F,D,Om
   real (kind=xi), dimension(42) :: ReREN,ImREN,ReMHB,ImMHB, &
     sigma,phi
-  real(kind=xi) :: Me,Ve,Te,Ma,Ju,Sa,Ur,Ne,Pa, lpar1,lpar2,lpar3,lspar1,lspar2, &
-    lspar3,Fpar1,Fpar2,Fpar3,Dpar1,Dpar2,Dpar3,omegapar1,omegapar2,omegapar3, &
-    ReCOR,ImCOR,ReADD,ImADD,ReRET,ImRET,Periode
+  real(kind=xi) :: Me,Ve,Te,Ma,Ju,Sa,Ur,Ne,Pa, lpar1,lpar2,lpar3,lspar1, &
+    lspar2, lspar3,Fpar1,Fpar2,Fpar3,Dpar1,Dpar2,Dpar3,omegapar1, omegapar2, &
+    omegapar3, ReCOR,ImCOR,ReADD,ImADD,ReRET,ImRET,Periode
   character(10) :: Aj
 
   real(kind=xi), dimension(5980) :: t, dX, dY, errdX, errdY, corrdXdY
   real(kind=xi), dimension(11960) :: dXdY
-  real(kind=xi) :: var, exa, exb
+  real(kind=xi) :: var
   character(20) :: carc
 
   real(kind=xi), dimension(11960,84) :: M
@@ -45,7 +45,8 @@ program lsq
     Sa,Ur,Ne,Pa,Periode,ReREN(i),ImREN(i),ReMHB(i),ImMHB(i),ReCOR, &
     ImCOR,ReADD,ImADD,ReRET,ImRET
 !Calculate the total frequency and phase      
-    sigma(i) = l(i)*sigmal + ls(i)*sigmals + F(i)*sigmaF + D(i)*sigmaD + Om(i)*sigmaomega
+    sigma(i) = l(i)*sigmal + ls(i)*sigmals + F(i)*sigmaF + D(i)*sigmaD + &
+            Om(i)*sigmaomega
     phi(i) = l(i)*phil + ls(i)*phils + F(i)*phiF + D(i)*phiD + Om(i)*phiomega
   end do
   close(15)
@@ -116,13 +117,13 @@ program lsq
 !  print*, 'M(1,1) = ', M(1,1)
 !  print*, 'M(11960,84) = ', M(11960,84)
 
-! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
+!Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
   Q = transpose(M)  !Transopse the Matrix
   MM = matmul(Q,M)  !Multiply the Matrix
   P = inv(MM) 	    !Inverse the Matrix using function which defined
   MMM = matmul(P,Q)
 
-! Calculate the amplitude
+!Calculate the amplitude
   Ampl = matmul(MMM,dXdY)
   do i=1,42
     s = 42 + i
@@ -140,24 +141,24 @@ program lsq
     integer, dimension(size(A,1)) :: ipiv   ! pivot indices
     integer :: n, info
 
-    ! External procedures defined in LAPACK
+    !External procedures defined in LAPACK
     external DGETRF
     external DGETRI
 
-    ! Store A in Ainv to prevent it from being overwritten by LAPACK
+    !Store A in Ainv to prevent it from being overwritten by LAPACK
     Ainv = A
     n = size(A,1)
 
-! DGETRF computes an LU factorization of a general M-by-N matrix A
-! using partial pivoting with row interchanges.
+!DGETRF computes an LU factorization of a general M-by-N matrix A
+!using partial pivoting with row interchanges.
     call DGETRF(n, n, Ainv, n, ipiv, info)
 
     if (info /= 0) then
        stop 'Matrix is numerically singular!'
     end if
 
-! DGETRI computes the inverse of a matrix using the LU factorization
-! computed by DGETRF.
+!DGETRI computes the inverse of a matrix using the LU factorization
+!computed by DGETRF.
     call DGETRI(n, Ainv, n, ipiv, work, n, info)
 
     if (info /= 0) then
