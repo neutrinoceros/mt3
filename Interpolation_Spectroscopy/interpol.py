@@ -144,40 +144,29 @@ def plot_signalVSmean(ax,t,xdata,sigx,tm,xm,mask) :
     ax.plot(tm,xm,lw=1,alpha=0.8,label=str(step))
 
 
-#======================================================================    
-#                           plot script
-#======================================================================    
+def interpolation_function(data_time,data_signal,data_sigma,interp_time_step=15):
+#function to interpolate the data_signal and data_time with a step of inter_time_step
+
+#argument of function#
+#data_time        :: time of data set
+#data_signal      :: signal of data set
+#data_error       :: sigma of mesured signal
+#interp_time_step :: time step of interpolation, 15 by default
+######################
+
+#return Value#
+#interp_time   :: interpolated time with the good timestep
+#interp_signal :: interpolated signal with the good timestep 
+##############
+
+#masking data to kill bad value off signal
+  mask_value = get_mask(data_signal,data_sigma)
+
+#processing interpolation
+  interp_time,interp_signal=get_mean_signal(data_time, data_signal, data_sigma, mask_value, step=interp_time_step, ignore=200,method=2)
+
+  return interp_time,interp_signal,mask_value
 
 
-#data loading
-filename = '../data/opa2015a.eops'
-tab      = np.genfromtxt(filename,usecols=(0,4,5,9,10))
-
-time,xpol,ypol,sigxpol,sigypol = tab[:,0],tab[:,1],tab[:,2],tab[:,3],tab[:,4]
-
-#plotting
-pl.ion()
-fig,axes = pl.subplots(nrows=2)
-pl.show()
-axes[0].set_title("method 2")
-
-maskx      = get_mask(xpol,sigxpol)
-masky      = get_mask(ypol,sigypol)
-for step in [15.] :
-    #data processing
-    tmeanx,xmean = get_mean_signal(time,xpol,sigxpol,maskx,step=step,ignore=200,method=2)
-    tmeany,ymean = get_mean_signal(time,ypol,sigypol,masky,step=step,ignore=200,method=2)
-
-    plot_signalVSmean(axes[0],time,xpol,sigxpol,tmeanx,xmean,maskx)
-    plot_signalVSmean(axes[1],time,ypol,sigypol,tmeany,ymean,masky)
-
-mtime     = ma.masked_array(time,maskx)
-mxpol     = ma.masked_array(xpol,maskx)
-axes[0].scatter(mtime,xpol,c='m',edgecolor='face',marker='o',s=1,alpha=0.8)
-axes[0].errorbar(mtime,xpol,yerr=sigxpol,fmt='+',alpha=0.6,markersize=1)
-
-pl.legend()
-pl.draw()
-pl.ioff()
-
-raw_input()
+#end function interpolation_function#
+###################################################################
