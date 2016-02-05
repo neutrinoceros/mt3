@@ -10,7 +10,12 @@ time,xpol,ypol,sigxpol,sigypol = tab[:,0],tab[:,1],tab[:,2],tab[:,3],tab[:,4]
 pl.ion()
 fig,axes = pl.subplots(nrows=2)
 pl.show()
-#axes[0].set_title("method 2")
+
+method   = raw_input("Use interpolation method 1 or 2 ? (I don't want to influence your choice but 2 is definitly better)     ")
+while method not in [1,2] :
+    method   = raw_input("""I said "1 or 2", that's not so hard a choice, I'll give you another try :      """)
+    
+axes[0].set_title("method {}".format(method))
 
 maskx      = get_mask(xpol,sigxpol)
 masky      = get_mask(ypol,sigypol)
@@ -18,8 +23,8 @@ masky      = get_mask(ypol,sigypol)
 step = 15
 #data processing
 
-tmeanx,xmean = get_mean_signal(time,xpol,sigxpol,maskx,step=step,ignore=200,method=2)
-tmeany,ymean = get_mean_signal(time,ypol,sigypol,masky,step=step,ignore=200,method=2)
+tmeanx,xmean = get_mean_signal(time,xpol,sigxpol,maskx,step=step,ignore=200,method=method)
+tmeany,ymean = get_mean_signal(time,ypol,sigypol,masky,step=step,ignore=200,method=method)
 
 plot_signalVSmean(axes[0],time,xpol,sigxpol,tmeanx,xmean,maskx)
 plot_signalVSmean(axes[1],time,ypol,sigypol,tmeany,ymean,masky)
