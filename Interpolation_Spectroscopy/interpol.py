@@ -159,7 +159,7 @@ def interpolation_function(data_time,data_signal,data_sigma,interp_time_step=15)
 #processing interpolation
   interp_time,interp_signal=get_mean_signal(data_time, data_signal, data_sigma, mask_value, step=interp_time_step, ignore=200,method=2)
 
-  return interp_time,interp_signal,mask_value
+  return interp_time,interp_signal
 
 
 #end function interpolation_function#
