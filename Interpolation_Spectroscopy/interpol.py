@@ -13,7 +13,7 @@
 import numpy as np
 import numpy.ma as ma
 import pylab as pl
-
+import math
 
 #======================================================================    
 #                           functions def
@@ -24,21 +24,11 @@ def get_mask(signal,err) :
 
     mask = []
     for i in range(len(signal)) :
-#        toofar = (np.abs(signal[i]) - 2*err[i] > 0) 
-        toofar = False
-        if signal[i] == 0.0 or toofar:
+        if signal[i] == 0.0 or err[i] == 0.0 :
             mask.append(1)
         else :
             mask.append(0)
     return mask
-
-
-def set_zeros2ones(w) :
-    #used to avoid infinite weights that would occur when error bar is zero
-    for i in range(len(w)) :
-        if w[i] == 0 :
-            w[i] = 1.
-    w = w**(-1)
 
 
 def comp_mean(xdata,ydata,ysigma,tmin,h=7.0) :
@@ -53,6 +43,7 @@ def comp_mean(xdata,ydata,ysigma,tmin,h=7.0) :
     a,b = np.polyfit(xdata,ydata,1,w=w)
     ymean = a/2 * (h + 2*tmin) + b
     return ymean
+
 
 def ponderateur(t,om) :
     #arbitrary weight function
@@ -72,7 +63,6 @@ def comp_mean2(time,xdata,xsigma,tmin,h=7.0) :
     om   = 2*np.pi/h
     
     w = np.array(xsigma)
-    set_zeros2ones(w)
     w = w**-2
 #    w *= ponderateur(x,Norm,om,phi)
 #    w *= ponderateur(x,om)
@@ -117,9 +107,10 @@ def get_mean_signal(time,xpol,sigxpol,mask,step=20.,ignore=200,method=2) :
             i += 1
         tm = tmin + step/2.0
         xm = cm(tdata,xdata,xsigma,tmin,step)
- 
-        tmean.append(tm)
-        xmean.append(xm)
+
+        if not (math.isnan(tm) or math.isnan(xm)) :
+            tmean.append(tm)
+            xmean.append(xm)
         tmin += step
     return tmean,xmean
 

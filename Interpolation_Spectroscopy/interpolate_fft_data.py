@@ -39,6 +39,9 @@ sample_step=15 #days
 interpolated_time_X,interpolated_dX=intp.interpolation_function(data_time,dX_array,dX_sigma,interp_time_step=sample_step)
 interpolated_time_Y,interpolated_dY=intp.interpolation_function(data_time,dY_array,dY_sigma,interp_time_step=sample_step)
 
+print interpolated_time_X[-1],interpolated_dX[-1]
+raw_input()
+
 #temporal offset put to zero
 interpolated_time_X=interpolated_time_X[:]-interpolated_time_X[0]
 interpolated_time_Y=interpolated_time_Y[:]-interpolated_time_Y[0]
