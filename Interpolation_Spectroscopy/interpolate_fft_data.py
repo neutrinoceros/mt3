@@ -43,15 +43,52 @@ interpolated_time_Y,interpolated_dY=intp.interpolation_function(data_time,dY_arr
 interpolated_time_X=interpolated_time_X[:]-interpolated_time_X[0]
 interpolated_time_Y=interpolated_time_Y[:]-interpolated_time_Y[0]
 
-print "nbr temps interp X =",len(interpolated_time_X)
-print "nbr valeur signal X =",len(interpolated_dX)
-print "nbr temps interp Y =",len(interpolated_time_Y)
-print "nbr valeur signal Y =",len(interpolated_dY)
+# print "temps interp X =",interpolated_time_X
+print "valeur signal X =",interpolated_dX
 
 
 #fft processing
 frequence_X,spectral_X=ft.processing_fft(interpolated_time_X,interpolated_dX,sample_step)
 frequence_Y,spectral_Y=ft.processing_fft(interpolated_time_Y,interpolated_dY,sample_step)
+
+
+################
+#ploting script#
+################
+plt.figure(1)
+sub1 = plt.subplot(211)
+sub2 = plt.subplot(212)
+
+xmin=0.
+xmax=500.
+
+sub1.plot(1./frequence_X,spectral_X,'r-')
+sub1.set_title('Nutation dX')
+# sub1.set_xlabel('jour')
+sub1.set_ylabel('puissance spectral normalise')
+sub1.set_xlim(xmin,xmax)
+
+sub2.plot(1./frequence_Y,spectral_Y,'r-')
+sub2.set_title('Nutation dY')
+sub2.set_xlabel('jour')
+sub2.set_ylabel('puissance spectral normalise')
+sub2.set_xlim(xmin,xmax)
+
+
+plt.show()
+################
+
+
+
+# # ploting result
+# # plt.plot(frequence_X,spectral_X,label='nutation dX')
+# plt.plot(1./frequence_X,spectral_X,label='nutation dX')
+# plt.plot(1./frequence_Y,spectral_Y,label='nutation dY')
+# plt.xlabel('jour')
+# # plt.xlabel('cycle/jour')
+# plt.ylabel('puissance normalise')
+# plt.legend(loc='best')
+# plt.show()
 
 # final time to interpolate the time
 # final_time=(int(data[-1,0]/sample_step)+1)*sample_step
@@ -78,15 +115,13 @@ frequence_Y,spectral_Y=ft.processing_fft(interpolated_time_Y,interpolated_dY,sam
 # frequential axis
 # axe_f=np.linspace(0.,1./(2.*sample_step),Nbr_of_time/2)
 
-print "freq",len(frequence_X)
-print "spectral",len(spectral_X)
 
-# # ploting result
-plt.plot(frequence_X,spectral_X,label='nutation dX')
-# plt.plot(1./axe_f,Mod_fft_dY,label='nutation dY')
-plt.xlabel('jour')
-plt.ylabel('puissance normalise')
-plt.legend(loc='best')
+# # # ploting result
+# plt.plot(frequence_X,spectral_X,label='nutation dX')
+# # plt.plot(1./axe_f,Mod_fft_dY,label='nutation dY')
+# plt.xlabel('jour')
+# plt.ylabel('puissance normalise')
+# plt.legend(loc='best')
 
 #checking plot
 # plt.plot(data[:,0],data[:,1],'b')
@@ -95,4 +130,4 @@ plt.legend(loc='best')
 # plt.legend(loc='best')
 
 
-plt.show()
+# plt.show()
