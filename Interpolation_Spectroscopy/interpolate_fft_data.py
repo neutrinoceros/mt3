@@ -75,7 +75,8 @@ sub2.set_ylabel('puissance spectral normalise')
 sub2.set_xlim(xmin,xmax)
 
 
-plt.show()
+plt.savefig('frequence_nutation.pdf')
+# plt.show()
 ################
 
 
