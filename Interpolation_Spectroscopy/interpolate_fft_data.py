@@ -44,7 +44,7 @@ interpolated_time_X=interpolated_time_X[:]-interpolated_time_X[0]
 interpolated_time_Y=interpolated_time_Y[:]-interpolated_time_Y[0]
 
 # print "temps interp X =",interpolated_time_X
-print "valeur signal X =",interpolated_dX
+# print "valeur signal X =",interpolated_dX
 
 
 #fft processing
