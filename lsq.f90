@@ -9,7 +9,7 @@ program lsq
 !======================================================================    
 
   use arg_nut
-
+  use mod_matrix
   implicit none
 
 !======================================================================  
@@ -119,9 +119,9 @@ program lsq
 !  print*, 'M(11960,84) = ', M(11960,84)
 
 ! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
-  Q = transpose(M)  !Transopse the Matrix
-  MM = matmul(Q,M)  !Multiply the Matrix
-  P = inv(MM) 	    !Inverse the Matrix using function which defined
+  Q = transpose(M) ! Transopse the Matrix
+  MM = matmul(Q,M) ! Multiply the Matrix
+  P = inv(MM)      ! Inverse the Matrix using function which defined
   MMM = matmul(P,Q)
 
 ! Calculate the amplitude
@@ -131,40 +131,5 @@ program lsq
     A(i) = Ampl(i)
     B(i) = Ampl(s)
   end do
-
-  contains 
-
-  function inv(A) result(Ainv)
-    double precision, dimension(:,:), intent(in) :: A
-    double precision, dimension(size(A,1),size(A,2)) :: Ainv
-
-    double precision, dimension(size(A,1)) :: work  ! work array for LAPACK
-    integer, dimension(size(A,1)) :: ipiv   ! pivot indices
-    integer :: n, info
-
-    !External procedures defined in LAPACK
-    external DGETRF
-    external DGETRI
-
-    !Store A in Ainv to prevent it from being overwritten by LAPACK
-    Ainv = A
-    n = size(A,1)
-
-!DGETRF computes an LU factorization of a general M-by-N matrix A
-!using partial pivoting with row interchanges.
-    call DGETRF(n, n, Ainv, n, ipiv, info)
-
-    if (info /= 0) then
-       stop 'Matrix is numerically singular!'
-    end if
-
-!DGETRI computes the inverse of a matrix using the LU factorization
-!computed by DGETRF.
-    call DGETRI(n, Ainv, n, ipiv, work, n, info)
-
-    if (info /= 0) then
-       stop 'Matrix inversion failed!'
-    end if
-  end function inv
 
 end program lsq
