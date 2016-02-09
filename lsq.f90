@@ -16,31 +16,32 @@ program lsq
 ! Variables declaration
 !======================================================================  
 
-  integer, dimension(42) :: l,ls,F,D,Om
-  real (kind=xi), dimension(42) :: ReREN,ImREN,ReMHB,ImMHB, &
+  integer,parameter::Nbr_of_point=5980,Nbr_of_parameter=42
+  integer, dimension(Nbr_of_parameter) :: l,ls,F,D,Om !integer multiplicativ coefficent to process modeling pulsation
+  real (kind=xi), dimension(Nbr_of_parameter) :: ReREN,ImREN,ReMHB,ImMHB, &
     sigma,phi
   real(kind=xi) :: Me,Ve,Te,Ma,Ju,Sa,Ur,Ne,Pa, lpar1,lpar2,lpar3,lspar1, &
     lspar2, lspar3,Fpar1,Fpar2,Fpar3,Dpar1,Dpar2,Dpar3,omegapar1, omegapar2, &
     omegapar3, ReCOR,ImCOR,ReADD,ImADD,ReRET,ImRET,Periode
   character(10) :: Aj
 
-  real(kind=xi), dimension(5980) :: t, dX, dY, errdX, errdY, corrdXdY
-  real(kind=xi), dimension(11960) :: dXdY
+  real(kind=xi), dimension(Nbr_of_point) :: t, dX, dY, errdX, errdY, corrdXdY
+  real(kind=xi), dimension(2*Nbr_of_point) :: dXdY
   real(kind=xi) :: var
   character(20) :: carc
 
-  real(kind=xi), dimension(11960,84) :: M
-  real(kind=xi), dimension(84,84) :: MM, P
-  real(kind=xi), dimension(84,11960) :: Q, MMM
-  real(kind=xi), dimension(84) :: Ampl
-  real(kind=xi), dimension(42) :: A, B
+  real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter) :: M
+  real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_parameter) :: MM, P
+  real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_point) :: Q, MMM
+  real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl
+  real(kind=xi), dimension(Nbr_of_parameter) :: A, B
   integer :: i, j, k, r, s
 
 !Read "ondes.txt" data  
   open (unit=15, file="data/ondes.txt", status='old')
   read(15,*)
   read(15,*)
-  do i=1,42
+  do i=1,Nbr_of_parameter
     read (15,*) Aj,l(i),ls(i),F(i),D(i),Om(i),Me,Ve,Te,Ma,Ju, &
     Sa,Ur,Ne,Pa,Periode,ReREN(i),ImREN(i),ReMHB(i),ImMHB(i),ReCOR, &
     ImCOR,ReADD,ImADD,ReRET,ImRET
@@ -56,18 +57,18 @@ program lsq
   do k=1,38
     read(10,*)
   end do
-  do j=1,5980
+  do j=1,Nbr_of_point
     read (10,*) t(j), var, var, var, dX(j), dY(j), var, var, &
          carc, errdX(j), errdY(j), carc, var, var, var, corrdXdY(j), &
          var, carc, var, var, var, var, var, var, var, var, &
          var, var, var, var, carc
     if (errdX(j) .lt. 0.0009) then
-       errdX(j) = 0.0001
+       errdX(j) = 0.0001 !FIXME why 0.00001 ? and not 10000 ???
     end if
     if (errdY(j) .lt. 0.0009) then
-       errdY(j) = 0.0001
+       errdY(j) = 0.0001 !FIXME same thing 
     end if
-    s = 5980 + j
+    s = Nbr_of_point + j
     dXdY(j) = dX(j)
     dXdY(s) = dY(j)
   end do
@@ -86,37 +87,37 @@ program lsq
 
 !Create a Matrix of parameter sigma and phi with the uncertainty of dX and dY   
 
-  do j=1,5980
-    do k=1,42
+  do j=1,Nbr_of_point
+    do k=1,Nbr_of_parameter
       M(j,k) = (1./(errdX(j)**2))*cos(sigma(k)*t(j)+phi(k))
     end do
-    do k=1,42
-      r = 42 + k
+    do k=1,Nbr_of_parameter
+      r = Nbr_of_parameter + k
       M(j,r) = -(1./(errdX(j)**2))*sin(sigma(k)*t(j)+phi(k))
     end do
   end do
-  do j = 1,5980
-    s = 5980 + j
-    do k=1,42
+  do j = 1,Nbr_of_point
+    s = Nbr_of_point + j
+    do k=1,Nbr_of_parameter
       M(s,k) = (1./(errdY(j)**2))*sin(sigma(k)*t(j)+phi(k))
     end do
-    do k=1,42
-      r = 42 + k
+    do k=1,Nbr_of_parameter
+      r = Nbr_of_parameter + k
       M(s,r) = (1./(errdY(j)**2))*cos(sigma(k)*t(j)+phi(k))
     end do
   end do
 
-!  print*, 'Sigma (42) : ', sigma(42)
-!  print*, 'Phi (42) : ', phi(42)
-!  print*, 't (5980) :', t(5980)
-!  print*, 'Uncertainty of celestial pole offset dX (5980): ', errdX(5980)
-!  print*, 'Uncertainty of celestial pole offset dY (5980): ', errdY(5980)
+!  print*, 'Sigma (Nbr_of_parameter) : ', sigma(Nbr_of_parameter)
+!  print*, 'Phi (Nbr_of_parameter) : ', phi(Nbr_of_parameter)
+!  print*, 't (Nbr_of_point) :', t(Nbr_of_point)
+!  print*, 'Uncertainty of celestial pole offset dX (Nbr_of_point): ', errdX(Nbr_of_point)
+!  print*, 'Uncertainty of celestial pole offset dY (Nbr_of_point): ', errdY(Nbr_of_point)
 !  exa = (1/(errdX(1)**2))*cos(sigma(1)*t(1)+phi(1))
-!  exb = (1/(errdY(5980)**2))*cos(sigma(42)*t(5980)+phi(42))
+!  exb = (1/(errdY(Nbr_of_point)**2))*cos(sigma(Nbr_of_parameter)*t(Nbr_of_point)+phi(Nbr_of_parameter))
 !  print*, 'exa = ', exa
 !  print*, 'exb = ', exb
 !  print*, 'M(1,1) = ', M(1,1)
-!  print*, 'M(11960,84) = ', M(11960,84)
+!  print*, 'M(2*Nbr_of_point,2*Nbr_of_parameter) = ', M(2*Nbr_of_point,2*Nbr_of_parameter)
 
 ! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
   Q = transpose(M) ! Transopse the Matrix
@@ -126,8 +127,8 @@ program lsq
 
 ! Calculate the amplitude
   Ampl = matmul(MMM,dXdY)
-  do i=1,42
-    s = 42 + i
+  do i=1,Nbr_of_parameter
+    s = Nbr_of_parameter + i
     A(i) = Ampl(i)
     B(i) = Ampl(s)
   end do
