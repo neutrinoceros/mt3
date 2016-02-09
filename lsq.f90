@@ -68,11 +68,15 @@ program lsq
     if (errdY(j) .lt. 0.0009) then
        errdY(j) = 0.0001 !FIXME same thing 
     end if
-    s = Nbr_of_point + j
-    dXdY(j) = dX(j)
-    dXdY(s) = dY(j)
+    ! s = Nbr_of_point + j
+    ! dXdY(j) = dX(j)
+    ! dXdY(s) = dY(j)
   end do
   close(10)
+
+  dXdY(:Nbr_of_point)=dX/errdX
+  dXdY(Nbr_of_point+1:)=dY/errdY
+
 
 !  print*, size(dX,1)
 !  print*, 'Sigma (1) : ', sigma(1)
@@ -89,21 +93,21 @@ program lsq
 
   do j=1,Nbr_of_point
     do k=1,Nbr_of_parameter
-      M(j,k) = (1./(errdX(j)**2))*cos(sigma(k)*t(j)+phi(k))
+      M(j,k) = 1./errdX(j)*cos(sigma(k)*t(j)+phi(k))
     end do
     do k=1,Nbr_of_parameter
       r = Nbr_of_parameter + k
-      M(j,r) = -(1./(errdX(j)**2))*sin(sigma(k)*t(j)+phi(k))
+      M(j,r) = -1./errdX(j)*sin(sigma(k)*t(j)+phi(k))
     end do
   end do
   do j = 1,Nbr_of_point
     s = Nbr_of_point + j
     do k=1,Nbr_of_parameter
-      M(s,k) = (1./(errdY(j)**2))*sin(sigma(k)*t(j)+phi(k))
+      M(s,k) = 1./errdY(j)*sin(sigma(k)*t(j)+phi(k))
     end do
     do k=1,Nbr_of_parameter
       r = Nbr_of_parameter + k
-      M(s,r) = (1./(errdY(j)**2))*cos(sigma(k)*t(j)+phi(k))
+      M(s,r) = 1./errdY(j)*cos(sigma(k)*t(j)+phi(k))
     end do
   end do
 
