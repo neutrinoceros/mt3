@@ -72,9 +72,6 @@ program lsq
        errdY(j) = 100000.
     end if
 
-    ! s = Nbr_of_point + j
-    ! dXdY(j) = dX(j)
-    ! dXdY(s) = dY(j)
   end do
   close(10)
 
@@ -83,50 +80,42 @@ program lsq
   dXdY(Nbr_of_point+1:)=dY/errdY
 
 
-!  print*, size(dX,1)
-!  print*, 'Sigma (1) : ', sigma(1)
-!  print*, 'Phi (1) : ', phi(1)
-!  print*, 't (1) :', t(1)
-!  print*, 'Uncertainty of celestial pole offset dX (1): ', errdX(1)
-!  print*, 'Uncertainty of celestial pole offset dY (1): ', errdY(1)
-
 !======================================================================  
 !Least Square Method
 !======================================================================  
 
 !Create a Matrix of parameter sigma and phi with the uncertainty of dX and dY   
+!This matrix is compose by 4 distinct cadran
 
   do j=1,Nbr_of_point
+    !processing the 1st cadran of the matrix
     do k=1,Nbr_of_parameter
       M(j,k) = 1./errdX(j)*cos(sigma(k)*t(j)+phi(k))
     end do
+
+    !processing the 2nd cadran of the matrix
     do k=1,Nbr_of_parameter
       r = Nbr_of_parameter + k
       M(j,r) = -1./errdX(j)*sin(sigma(k)*t(j)+phi(k))
     end do
+
   end do
+
   do j = 1,Nbr_of_point
     s = Nbr_of_point + j
+
+    !processing the 3rd cadran of the matrix
     do k=1,Nbr_of_parameter
       M(s,k) = 1./errdY(j)*sin(sigma(k)*t(j)+phi(k))
     end do
+
+    !processing the 4th cadran of the matrix
     do k=1,Nbr_of_parameter
       r = Nbr_of_parameter + k
       M(s,r) = 1./errdY(j)*cos(sigma(k)*t(j)+phi(k))
     end do
-  end do
 
-!  print*, 'Sigma (Nbr_of_parameter) : ', sigma(Nbr_of_parameter)
-!  print*, 'Phi (Nbr_of_parameter) : ', phi(Nbr_of_parameter)
-!  print*, 't (Nbr_of_point) :', t(Nbr_of_point)
-!  print*, 'Uncertainty of celestial pole offset dX (Nbr_of_point): ', errdX(Nbr_of_point)
-!  print*, 'Uncertainty of celestial pole offset dY (Nbr_of_point): ', errdY(Nbr_of_point)
-!  exa = (1/(errdX(1)**2))*cos(sigma(1)*t(1)+phi(1))
-!  exb = (1/(errdY(Nbr_of_point)**2))*cos(sigma(Nbr_of_parameter)*t(Nbr_of_point)+phi(Nbr_of_parameter))
-!  print*, 'exa = ', exa
-!  print*, 'exb = ', exb
-!  print*, 'M(1,1) = ', M(1,1)
-!  print*, 'M(2*Nbr_of_point,2*Nbr_of_parameter) = ', M(2*Nbr_of_point,2*Nbr_of_parameter)
+  end do
 
 ! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
   Q = transpose(M) ! Transopse the Matrix
