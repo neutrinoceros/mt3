@@ -53,6 +53,43 @@ program lsq_450_days
   end do
   close(10)
 
+  !Creation of the matrix M
+  do j=1,Nbr_of_point
+    !processing the 1st cadran of the matrix
+    ! do k=1,Nbr_of_parameter
+    !   M(j,k) = 1./errdX(j)*cos(sigma(k)*t(j)+phi(k))
+    ! end do
+
+    !processing the 2nd cadran of the matrix
+    ! do k=1,Nbr_of_parameter
+    !   r = Nbr_of_parameter + k
+    !   M(j,r) = -1./errdX(j)*sin(sigma(k)*t(j)+phi(k))
+    ! end do
+    M(j,1) = 1./errdX(j)*cos(sigma*t(j))
+    M(j,2) = -1./errdX(j)*sin(sigma*t(j))
+
+  end do
+
+  do j = 1,Nbr_of_point
+    s = Nbr_of_point + j
+
+    !processing the 3rd cadran of the matrix
+    ! do k=1,Nbr_of_parameter
+    !   M(s,k) = 1./errdY(j)*sin(sigma(k)*t(j)+phi(k))
+    ! end do
+
+    !processing the 4th cadran of the matrix
+    ! do k=1,Nbr_of_parameter
+    !   r = Nbr_of_parameter + k
+    !   M(s,r) = 1./errdY(j)*cos(sigma(k)*t(j)+phi(k))
+    ! end do
+    M(s,1) = 1./errdY(j)*sin(sigma*t(j))
+    M(s,2) = 1./errdY(j)*cos(sigma*t(j))
+
+  end do
+
+
+
 
   
  
