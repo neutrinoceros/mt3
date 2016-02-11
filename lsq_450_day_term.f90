@@ -66,7 +66,7 @@ program lsq_450_days
     !   M(j,r) = -1./errdX(j)*sin(sigma(k)*t(j)+phi(k))
     ! end do
     M(j,1) = 1./errdX(j)*cos(sigma*t(j))
-    M(j,2) = -1./errdX(j)*sin(sigma*t(j))
+    M(j,2) = 1./errdX(j)*sin(sigma*t(j))
 
   end do
 
@@ -83,7 +83,7 @@ program lsq_450_days
     !   r = Nbr_of_parameter + k
     !   M(s,r) = 1./errdY(j)*cos(sigma(k)*t(j)+phi(k))
     ! end do
-    M(s,1) = 1./errdY(j)*sin(sigma*t(j))
+    M(s,1) = -1./errdY(j)*sin(sigma*t(j))
     M(s,2) = 1./errdY(j)*cos(sigma*t(j))
 
   end do
