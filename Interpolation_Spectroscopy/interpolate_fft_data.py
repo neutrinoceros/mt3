@@ -65,13 +65,13 @@ xmax=500.
 sub1.plot(1./frequence_X,spectral_X,'r-')
 sub1.set_title('Nutation dX')
 # sub1.set_xlabel('jour')
-sub1.set_ylabel('puissance spectral normalise')
+sub1.set_ylabel('puissance spectrale normalisee')
 sub1.set_xlim(xmin,xmax)
 
 sub2.plot(1./frequence_Y,spectral_Y,'r-')
 sub2.set_title('Nutation dY')
 sub2.set_xlabel('jour')
-sub2.set_ylabel('puissance spectral normalise')
+sub2.set_ylabel('puissance spectrale normalisee')
 sub2.set_xlim(xmin,xmax)
 
 
