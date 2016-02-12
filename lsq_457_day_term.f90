@@ -72,7 +72,7 @@ program lsq_457_days
   allocate(ampl_time(array_size))
   !------------------------------!
 
-  !==============================================!
+  !----------------------------------------------!
   !calculation of the amplitude at each time step!
   !----------------------------------------------!
 
@@ -81,16 +81,16 @@ program lsq_457_days
     date=t(j)+time_step
     do while(t(i)<date) ! finding the next point 
       i=i+1
-
-      if (i>array_size) exit amplitude_loop
+      if (i>array_size) exit amplitude_loop !avoiding overtaking momery
     end do 
 
   end do amplitude_loop
 
 
 
-  !==============================================!
+  !----------------------------------------------!
 
+  !==============!
   ! call processing_lsq_period(period,Nbr_of_parameter,Nbr_of_point,&
   !    dX,dY,errdX,errdY,t,&
   !    Ampl)
