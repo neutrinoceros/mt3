@@ -18,25 +18,29 @@ program lsq
 
   integer,parameter::Nbr_of_point=5980,Nbr_of_parameter=42
   integer, dimension(Nbr_of_parameter) :: l,ls,F,D,Om                          !integer multiplicative coefficent to process modeling pulsation
-  real (kind=xi), dimension(Nbr_of_parameter) :: ReREN,ImREN,ReMHB,ImMHB, &
+  real (kind=xi), dimension(Nbr_of_parameter) :: ReREN,ImREN,ReMHB,ImMHB,    &
     sigma,phi                                                                  !reading variables not used in the code
-  real(kind=xi) :: Me,Ve,Te,Ma,Ju,Sa,Ur,Ne,Pa, lpar1,lpar2,lpar3,lspar1, &
+  real(kind=xi) :: Me,Ve,Te,Ma,Ju,Sa,Ur,Ne,Pa, lpar1,lpar2,lpar3,lspar1,     &
     lspar2, lspar3,Fpar1,Fpar2,Fpar3,Dpar1,Dpar2,Dpar3,omegapar1, omegapar2, &
     omegapar3, ReCOR,ImCOR,ReADD,ImADD,ReRET,ImRET,Periode                     !reading variables not used in the code
   character(10) :: Aj                                                          !reading variables not used in the code
 
-  real(kind=xi), dimension(Nbr_of_point) :: t            !time of the mesure in julian days
-  real(kind=xi), dimension(Nbr_of_point) :: dX, dY       !delta between observe nutation and IAU2000 in mas
-  real(kind=xi), dimension(Nbr_of_point) :: errdX, errdY !error of the mesurment in mas
-  real(kind=xi), dimension(Nbr_of_point) :: corrdXdY     !correlation of the measure
-  real(kind=xi), dimension(2*Nbr_of_point) :: dXdY       !matrix of observable
-  real(kind=xi) :: var                                   !reading variable
-  character(20) :: carc                                  !reading variable
+  real(kind=xi), dimension(Nbr_of_point)   :: t              !time of the mesure in julian days
+  real(kind=xi), dimension(Nbr_of_point)   :: dX, dY         !delta between observe nutation and IAU2000 in mas
+  real(kind=xi), dimension(Nbr_of_point)   :: errdX, errdY   !error of the mesurment in mas
+  real(kind=xi), dimension(Nbr_of_point)   :: corrdXdY       !correlation of the measure
+  real(kind=xi), dimension(2*Nbr_of_point) :: dXdY           !matrix of observable
+  real(kind=xi) :: var                                       !reading variable
+  character(20) :: carc                                      !reading variable
 
-  real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter) :: M         !matrix like dXdY = M Ampl
-  real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_parameter) :: MM, P !MM is equal to tranpose(M) matrix product M
-  real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_point) :: Q, MMM
-  real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl                     !complex amplitude that we need to adjust
+
+
+  real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter + 4) :: M             !matrix like dXdY = M Ampl
+  real(kind=xi), dimension(2*Nbr_of_parameter + 4,2*Nbr_of_parameter + 4) :: MM, P !MM is equal to tranpose(M) matrix product M
+  real(kind=xi), dimension(2*Nbr_of_parameter + 4,2*Nbr_of_point) :: Q, MMM
+  real(kind=xi), dimension(2*Nbr_of_parameter + 4) :: Ampl                         !complex amplitude that we need to adjust
+
+
   real(kind=xi), dimension(Nbr_of_parameter) :: A, B
   integer :: i, j, k, r, s                                                 !iterators
   real(kind=xi) :: phase                                                   !instant phase used in matrix computation loop
@@ -101,7 +105,6 @@ program lsq
      s = Nbr_of_point + j
      do k=1,Nbr_of_parameter
         r = Nbr_of_parameter + k
-
         phase  = sigma(k)*t(j)+phi(k)
         M(j,k) = +1./errdX(j)*cos(phase)
         M(j,r) = -1./errdX(j)*sin(phase)
@@ -109,6 +112,17 @@ program lsq
         M(s,r) = +1./errdY(j)*cos(phase)
      end do
   end do
+
+
+  ! addition of more parameters : systematic slope and bias
+
+  M(1              : Nbr_of_point   , 2*Nbr_of_parameter + 1) = t
+  M(1              : Nbr_of_point   , 2*Nbr_of_parameter + 2) = 1.0_xi
+
+  M(Nbr_of_point+1 : 2*Nbr_of_point , 2*Nbr_of_parameter + 3) = t
+  M(Nbr_of_point+1 : 2*Nbr_of_point , 2*Nbr_of_parameter + 4) = 1.0_xi
+
+
 
 ! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
   Q = transpose(M) ! transpostion
@@ -118,7 +132,7 @@ program lsq
 
 ! Calculate corrections to complex amplitudes in the model
   Ampl = matmul(MMM,dXdY)
-  open (unit=12,file="amplitude.txt",status="new")
+  open (unit=12,file="amplitude.txt",status="replace")
   do i=1,Nbr_of_parameter
     s = Nbr_of_parameter + i
     A(i) = Ampl(i)
@@ -127,4 +141,12 @@ program lsq
   end do
   close(unit=12)
 
+  ! printing of slope and bias fitting results
+  s = 2*Nbr_of_parameter + 1
+  print*,
+  print*, 'slope (a), and bias (b) :  (a_re, b_re, a_im, b_im) :'
+  print*, Ampl(s:s+3)
+
+  print*,
+  
 end program lsq
