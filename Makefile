@@ -18,8 +18,11 @@ mod_matrix.o : mod_matrix.f90
 	$(FC) -c $^ 
 
 run: lsq
-	./lsq
+	./lsq.exe
 
 ###
 clean:
 	rm *.o *.mod *.exe 2> /dev/null
+
+clear:
+	rm amplitude.txt
