@@ -1,4 +1,4 @@
-program lsq_450_days
+program lsq_457_days
 
   !program in order to fit the complex amplitude of the term at 450 day
 
@@ -8,7 +8,7 @@ program lsq_450_days
 
 
   integer,parameter        :: Nbr_of_point=5980,Nbr_of_parameter=1
-  real (kind=xi),parameter :: period=450._xi!days period wich we want to fit the complex amplitude
+  real (kind=xi),parameter :: period=457._xi!days period wich we want to fit the complex amplitude
   real (kind=xi)           :: sigma = 2._xi*pi/period
 
   real(kind=xi), dimension(Nbr_of_point)   :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
@@ -99,8 +99,8 @@ program lsq_450_days
   MMM = matmul(P,Q)
 
 
-! Calculate the amplitude
+  !Calculate the amplitude
   Ampl = matmul(MMM,dXdY)
   print*,Ampl
  
-end program lsq_450_days
+end program lsq_457_days
