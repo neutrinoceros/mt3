@@ -5,7 +5,7 @@ LFLAG = -llapack -lblas
 
 all : lsq lsq_457
 
-lsq : mod_matrix.o arg_nut.o lsq.f90 
+lsq : mod_matrix.o arg_nut.o mod_series.o lsq.f90 
 	$(FC) $(FLAGS) $^ -o lsq.exe $(LFLAG)
 
 lsq_457 : mod_matrix.o arg_nut.o lsq_457_day_term.f90
@@ -17,12 +17,12 @@ arg_nut.o : arg_nut.f90
 mod_matrix.o : mod_matrix.f90
 	$(FC) -c $^ 
 
+mod_series.o : mod_series.f90
+	$(FC) -c $^
+
 run: lsq
 	./lsq.exe
 
 ###
 clean:
 	rm *.o *.mod *.exe 2> /dev/null
-
-clear:
-	rm amplitude.txt
