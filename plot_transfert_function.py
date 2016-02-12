@@ -8,6 +8,9 @@
 #       * etaR is complex nutation amplitudes from REN (Rigid Earth)
 #         columns 17 and 18 in ondes.txt
 #
+# NOTE : th_T does not show a resonance where it is supposed to ...
+#         fix it plz
+#
 #======================================================================
 
 import numpy as np
@@ -56,7 +59,7 @@ sigCW   =  1.816829e-7 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 sigNDFW = -7.308004e-5 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 
 
-def th_T(omega) :
+def th_T(omega) : #fixme
     """defined as eq 54 in "Drilling to the center of the Earth with VLBI" """
     sigprime = omega/(2.0*np.pi)
     sig = sigprime - Om
