@@ -17,28 +17,28 @@ program lsq
 !======================================================================  
 
   integer,parameter::Nbr_of_point=5980,Nbr_of_parameter=42
-  integer, dimension(Nbr_of_parameter) :: l,ls,F,D,Om !integer multiplicativ coefficent to process modeling pulsation
+  integer, dimension(Nbr_of_parameter) :: l,ls,F,D,Om                          !integer multiplicative coefficent to process modeling pulsation
   real (kind=xi), dimension(Nbr_of_parameter) :: ReREN,ImREN,ReMHB,ImMHB, &
-    sigma,phi !reading variable not use in the code
+    sigma,phi                                                                  !reading variables not used in the code
   real(kind=xi) :: Me,Ve,Te,Ma,Ju,Sa,Ur,Ne,Pa, lpar1,lpar2,lpar3,lspar1, &
     lspar2, lspar3,Fpar1,Fpar2,Fpar3,Dpar1,Dpar2,Dpar3,omegapar1, omegapar2, &
-    omegapar3, ReCOR,ImCOR,ReADD,ImADD,ReRET,ImRET,Periode !reading variable not use in the code
-  character(10) :: Aj !reading variable not use in the code
+    omegapar3, ReCOR,ImCOR,ReADD,ImADD,ReRET,ImRET,Periode                     !reading variables not used in the code
+  character(10) :: Aj                                                          !reading variables not used in the code
 
-  real(kind=xi), dimension(Nbr_of_point) :: t !time of the mesure in julian days
-  real(kind=xi), dimension(Nbr_of_point) :: dX, dY !delta between observe nutation and IAU2000 in mas
+  real(kind=xi), dimension(Nbr_of_point) :: t            !time of the mesure in julian days
+  real(kind=xi), dimension(Nbr_of_point) :: dX, dY       !delta between observe nutation and IAU2000 in mas
   real(kind=xi), dimension(Nbr_of_point) :: errdX, errdY !error of the mesurment in mas
-  real(kind=xi), dimension(Nbr_of_point) :: corrdXdY !correlation of the measure
-  real(kind=xi), dimension(2*Nbr_of_point) :: dXdY !matrix of observable
-  real(kind=xi) :: var !reading variable
-  character(20) :: carc !reading variable
+  real(kind=xi), dimension(Nbr_of_point) :: corrdXdY     !correlation of the measure
+  real(kind=xi), dimension(2*Nbr_of_point) :: dXdY       !matrix of observable
+  real(kind=xi) :: var                                   !reading variable
+  character(20) :: carc                                  !reading variable
 
-  real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter) :: M !matrix like dXdY = M Ampl
+  real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter) :: M         !matrix like dXdY = M Ampl
   real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_parameter) :: MM, P !MM is equal to tranpose(M) matrix product M
   real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_point) :: Q, MMM
-  real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl !complex amplitude that we need to adjust
+  real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl                     !complex amplitude that we need to adjust
   real(kind=xi), dimension(Nbr_of_parameter) :: A, B
-  integer :: i, j, k, r, s !loop variable
+  integer :: i, j, k, r, s                                                 !iterators
 
 !Read "ondes.txt" data  
   open (unit=15, file="data/ondes.txt", status='old')
@@ -127,13 +127,16 @@ program lsq
   end do
 
 ! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
-  Q = transpose(M) ! Transopse the Matrix
-  MM = matmul(Q,M) ! Multiply the Matrix
-  P = inv(MM)      ! Inverse the Matrix using function which defined
+  Q = transpose(M) ! transpostion
+  MM = matmul(Q,M) ! matrix product
+  P = inv(MM)      ! matrix inversion using function defined in mod_matrix.f90
   MMM = matmul(P,Q)
 
-! Calculate the amplitude
+! Calculate corrections to complex amplitudes in the model
   Ampl = matmul(MMM,dXdY)
+  print*,
+  print*, 'Corrections to complex amplitudes (A(i)/B(i)) :'
+  print*,
   do i=1,Nbr_of_parameter
     s = Nbr_of_parameter + i
     A(i) = Ampl(i)
@@ -141,5 +144,6 @@ program lsq
     ! print*,sigma(i)
     print*,i, A(i), B(i)
   end do
-
+  print*,
+  
 end program lsq
