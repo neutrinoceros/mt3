@@ -1,6 +1,8 @@
 #Plot
 
 reset
+set terminal pdf color
+set output "pictures/amplitude.pdf"
 set nokey
 set multiplot 
 set size 1, 0.5
@@ -16,5 +18,4 @@ set notitle
 set xlabel "Number of Amplitude"
 set ylabel "Y"
 plot 'amplitude.txt' u 3:2 with linespoints lc 2 #Plot Y amplitude
-pause -1
 unset multiplot
