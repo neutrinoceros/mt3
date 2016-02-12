@@ -132,21 +132,19 @@ program lsq
 
 ! Calculate corrections to complex amplitudes in the model
   Ampl = matmul(MMM,dXdY)
-  print*,
-  print*, 'Corrections to complex amplitudes (A(i)/B(i)) :'
-  print*,
+  open (unit=12,file="amplitude.txt",status="new")
   do i=1,Nbr_of_parameter
     s = Nbr_of_parameter + i
     A(i) = Ampl(i)
     B(i) = Ampl(s)
-    ! print*,sigma(i)
-    print*,i, A(i), B(i)
+    write(12,*) A(i), B(i), i
   end do
-  
+  close(unit=12)
 
+  ! printing of slope and bias fitting results
   s = 2*Nbr_of_parameter + 1
   print*,
-  print*, 'Bias, slope (a_re, b_re, a_im, b_im) :'
+  print*, 'slope (a), and bias (b) :  (a_re, b_re, a_im, b_im) :'
   print*, Ampl(s:s+3)
 
   print*,

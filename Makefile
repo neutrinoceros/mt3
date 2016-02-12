@@ -23,3 +23,6 @@ run: lsq
 ###
 clean:
 	rm *.o *.mod *.exe 2> /dev/null
+
+clear:
+	rm amplitude.txt
