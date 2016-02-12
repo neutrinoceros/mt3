@@ -39,6 +39,7 @@ program lsq
   real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl                     !complex amplitude that we need to adjust
   real(kind=xi), dimension(Nbr_of_parameter) :: A, B
   integer :: i, j, k, r, s                                                 !iterators
+  real(kind=xi) :: phase                                                   !instant phase used in matrix computation loop
 
 !Read "ondes.txt" data  
   open (unit=15, file="data/ondes.txt", status='old')
@@ -94,36 +95,19 @@ program lsq
 !======================================================================  
 
 !Create a Matrix of parameter sigma and phi with the uncertainty of dX and dY   
-!This matrix is compose by 4 distinct cadran
+!This matrix is composed of 4 distinct cadrans
 
   do j=1,Nbr_of_point
-    !processing the 1st cadran of the matrix
-    do k=1,Nbr_of_parameter
-      M(j,k) = 1./errdX(j)*cos(sigma(k)*t(j)+phi(k))
-    end do
+     s = Nbr_of_point + j
+     do k=1,Nbr_of_parameter
+        r = Nbr_of_parameter + k
 
-    !processing the 2nd cadran of the matrix
-    do k=1,Nbr_of_parameter
-      r = Nbr_of_parameter + k
-      M(j,r) = -1./errdX(j)*sin(sigma(k)*t(j)+phi(k))
-    end do
-
-  end do
-
-  do j = 1,Nbr_of_point
-    s = Nbr_of_point + j
-
-    !processing the 3rd cadran of the matrix
-    do k=1,Nbr_of_parameter
-      M(s,k) = 1./errdY(j)*sin(sigma(k)*t(j)+phi(k))
-    end do
-
-    !processing the 4th cadran of the matrix
-    do k=1,Nbr_of_parameter
-      r = Nbr_of_parameter + k
-      M(s,r) = 1./errdY(j)*cos(sigma(k)*t(j)+phi(k))
-    end do
-
+        phase  = sigma(k)*t(j)+phi(k)
+        M(j,k) = +1./errdX(j)*cos(phase)
+        M(j,r) = -1./errdX(j)*sin(phase)
+        M(s,k) = +1./errdY(j)*sin(phase)
+        M(s,r) = +1./errdY(j)*cos(phase)
+     end do
   end do
 
 ! Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
