@@ -131,11 +131,14 @@ program lsq
 
 ! Calculate the amplitude
   Ampl = matmul(MMM,dXdY)
+  open (unit=12,file="amplitude.txt",status="new")
   do i=1,Nbr_of_parameter
     s = Nbr_of_parameter + i
     A(i) = Ampl(i)
     B(i) = Ampl(s)
     print*,A(i), B(i)
+    write(12,*) A(i), B(i), i
   end do
+  close(unit=12)
 
 end program lsq
