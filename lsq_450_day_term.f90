@@ -18,11 +18,11 @@ program lsq_450_days
   real(kind=xi) :: var !reading variable
   character(20) :: carc !reading variable
 
-  real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter) :: M !matrix like dXdY = M Ampl
+  real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter)     :: M !matrix like dXdY = M Ampl
   real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_parameter) :: MM, P !MM is equal to tranpose(M) matrix product M
-  real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_point) :: Q, MMM
-  real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl !complex amplitude that we need to adjust
-  real(kind=xi), dimension(Nbr_of_parameter) :: A, B
+  real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_point)     :: Q, MMM
+  real(kind=xi), dimension(2*Nbr_of_parameter)                    :: Ampl !complex amplitude that we need to adjust
+
   integer :: i, j, k, r, s !loop variable
   integer :: ios !checking io variable
 
@@ -88,9 +88,19 @@ program lsq_450_days
 
   end do
 
+  !computation of the observationnal array
+  dXdY(:Nbr_of_point)=dX/errdX
+  dXdY(Nbr_of_point+1:)=dY/errdY
+
+  !Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
+  Q = transpose(M) ! Transopse the Matrix
+  MM = matmul(Q,M) ! Multiply the Matrix
+  P = inv(MM)      ! Inverse the Matrix using function which defined
+  MMM = matmul(P,Q)
 
 
-
-  
+! Calculate the amplitude
+  Ampl = matmul(MMM,dXdY)
+  print*,Ampl
  
 end program lsq_450_days
