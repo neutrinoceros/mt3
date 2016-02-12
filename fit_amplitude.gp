@@ -2,7 +2,7 @@
 
 reset
 set terminal pdf color
-set output "pictures/amplitude.pdf"
+set output "pictures/fit_amplitude.pdf"
 set nokey
 set multiplot 
 set size 1, 0.5
