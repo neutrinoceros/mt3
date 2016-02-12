@@ -43,14 +43,14 @@
   U -2  0 -2  0 -2  0  0  0  0  0  0  0  0  0      -6.86     0.0406     0.0000     0.0444     0.0003     0.0000     0.0000     0.0000     0.0000     0.000     0.000
   U  2  0  2  0  2  0  0  0  0  0  0  0  0  0       6.86     1.2625     0.0000     1.2794    -0.0056     0.0000     0.0000     0.0000     0.0000     0.000     0.000
 
-REN: rigid earth nutation (Souchay et al. 1997).
+%REN: rigid earth nutation (Souchay et al. 1997).
 
-A = (Re + i Im) exp(i sigma t)
+%A = (Re + i Im) exp(i sigma t)
 
-sigma = somme de coefficients entiers * (freq * t + phase)
+%sigma = somme de coefficients entiers * (freq * t + phase)
 
-0*l + 0*ls + 0*F + 0*D + 1*Om = 1*freq de Om + 1*phase de Om = -6962890.543100*t+125.04455501
-ici t en siecles (juliens) par rapport à J2000 (1 siecle = 36525 jours)
+%0*l + 0*ls + 0*F + 0*D + 1*Om = 1*freq de Om + 1*phase de Om = -6962890.543100*t+125.04455501
+%ici t en siecles (juliens) par rapport à J2000 (1 siecle = 36525 jours)
 
-Comparaison à faire : (amplitude ajustee sur la serie + amplitude IAU 2000) / amplitude REN
+%Comparaison à faire : (amplitude ajustee sur la serie + amplitude IAU 2000) / amplitude REN
 
