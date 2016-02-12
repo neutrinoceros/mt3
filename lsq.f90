@@ -132,12 +132,12 @@ program lsq
 
 ! Calculate corrections to complex amplitudes in the model
   Ampl = matmul(MMM,dXdY)
-  open (unit=12,file="amplitude.txt",status="replace")
+  open (unit=12,file="amplitude.dat",status="replace")
   do i=1,Nbr_of_parameter
     s = Nbr_of_parameter + i
     A(i) = Ampl(i)
     B(i) = Ampl(s)
-    write(12,*) A(i), B(i), i
+    write(12,*) A(i), B(i), sigma(i)
   end do
   close(unit=12)
 
