@@ -25,7 +25,10 @@ program lsq
     omegapar3, ReCOR,ImCOR,ReADD,ImADD,ReRET,ImRET,Periode !reading variable not use in the code
   character(10) :: Aj !reading variable not use in the code
 
-  real(kind=xi), dimension(Nbr_of_point) :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
+  real(kind=xi), dimension(Nbr_of_point) :: t !time of the mesure in julian days
+  real(kind=xi), dimension(Nbr_of_point) :: dX, dY !delta between observe nutation and IAU2000 in mas
+  real(kind=xi), dimension(Nbr_of_point) :: errdX, errdY !error of the mesurment in mas
+  real(kind=xi), dimension(Nbr_of_point) :: corrdXdY !correlation of the measure
   real(kind=xi), dimension(2*Nbr_of_point) :: dXdY !matrix of observable
   real(kind=xi) :: var !reading variable
   character(20) :: carc !reading variable
@@ -79,6 +82,9 @@ program lsq
   dXdY(:Nbr_of_point)=dX/errdX
   dXdY(Nbr_of_point+1:)=dY/errdY
 
+  !conversion of time array : days -->julian century
+  t=t/36525.
+
 
 !======================================================================  
 !Least Square Method
@@ -129,6 +135,7 @@ program lsq
     s = Nbr_of_parameter + i
     A(i) = Ampl(i)
     B(i) = Ampl(s)
+    print*,A(i), B(i)
   end do
 
 end program lsq

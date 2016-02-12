@@ -14,7 +14,6 @@ module arg_nut
   real (kind=xi), parameter :: pi = 4._xi*atan(1._xi)
 
   !phi.. (phase) equal to constant part of the equation
-  !FIXME we need to check the unity of this parameter like Lambert said us, but now i don't know how doing that
   real(kind = xi), parameter :: phil     = 134.96340251_xi*pi/180._xi
   real(kind = xi), parameter :: phils    = 357.52910918_xi*pi/180._xi
   real(kind = xi), parameter :: phiF     = 93.27209062_xi*pi/180._xi
