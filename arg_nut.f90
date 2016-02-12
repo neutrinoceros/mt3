@@ -13,6 +13,10 @@ module arg_nut
   integer, parameter        :: xi = selected_real_kind (15)
   real (kind=xi), parameter :: pi = 4._xi*atan(1._xi)
 
+  !earth parameter
+  real (kind=xi), parameter :: t2000 = 51544.5
+  real (kind=xi), parameter :: Nbr_days_in_Century = 36525
+
   !phi.. (phase) equal to constant part of the equation
   real(kind = xi), parameter :: phil     = 134.96340251_xi*pi/180._xi
   real(kind = xi), parameter :: phils    = 357.52910918_xi*pi/180._xi
@@ -29,7 +33,8 @@ module arg_nut
 
   private 
 
-  public :: xi, pi, phil, phils, phiF, phiD, phiomega, sigmal, sigmals, sigmaF, sigmaD, sigmaomega
+  public :: xi, pi, phil, phils, phiF, phiD, phiomega, sigmal, sigmals, sigmaF, sigmaD, sigmaomega, t2000, Nbr_days_in_Century
+
 
 contains
 end module arg_nut
