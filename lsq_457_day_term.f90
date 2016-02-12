@@ -10,19 +10,15 @@ program lsq_457_days
 
   integer,parameter        :: Nbr_of_point=5980,Nbr_of_parameter=1
   real (kind=xi),parameter :: period=457._xi!days period wich we want to fit the complex amplitude
-  real (kind=xi)           :: sigma = 2._xi*pi/period
+  ! real (kind=xi)           :: sigma = 2._xi*pi/period
 
   real(kind=xi), dimension(Nbr_of_point)   :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
-  real(kind=xi), dimension(2*Nbr_of_point) :: dXdY !matrix of observable
 
 
   real(kind=xi) :: var !reading variable
   character(20) :: carc !reading variable
 
-  real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter)     :: M !matrix like dXdY = M Ampl
-  real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_parameter) :: MM, P !MM is equal to tranpose(M) matrix product M
-  real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_point)     :: Q, MMM
-  real(kind=xi), dimension(2*Nbr_of_parameter)                    :: Ampl !complex amplitude that we need to adjust
+ real(kind=xi), dimension(2*Nbr_of_parameter)                    :: Ampl !complex amplitude that we need to adjust
 
   integer :: i, j, k, r, s !loop variable
   integer :: ios !checking io variable
@@ -54,35 +50,7 @@ program lsq_457_days
   end do
   close(10)
 
-  !Creation of the matrix M
-  do j=1,Nbr_of_point
-    s = Nbr_of_point + j
-
-    M(j,1) = 1./errdX(j)*cos(sigma*t(j))
-    M(j,2) = 1./errdX(j)*sin(sigma*t(j))
-
-    M(s,1) = -1./errdY(j)*sin(sigma*t(j))
-    M(s,2) = 1./errdY(j)*cos(sigma*t(j))
-
-  end do
-
-  !computation of the observationnal array
-  dXdY(:Nbr_of_point)=dX/errdX
-  dXdY(Nbr_of_point+1:)=dY/errdY
-
-  !Inverse matrix with A = ((M[t]*M)^-1)*(M[t]*X)
-  Q = transpose(M) ! Transopse the Matrix
-  MM = matmul(Q,M) ! Multiply the Matrix
-  P = inv(MM)      ! Inverse the Matrix using function which defined
-  MMM = matmul(P,Q)
-
-
-  !Calculate the amplitude
-  Ampl = matmul(MMM,dXdY)
-  print*,"first method of calculation",Ampl
-
-  !testing the new function
-  call processing_lsq_period(period,Nbr_of_parameter,Nbr_of_point,&
+ call processing_lsq_period(period,Nbr_of_parameter,Nbr_of_point,&
     dX,dY,errdX,errdY,t,&
     Ampl)
  
