@@ -17,5 +17,5 @@ set notitle
 set xlabel "Number of Amplitude"
 set ylabel "Y"
 plot 'amplitude.txt' u 3:2 with linespoints lc 2 #Plot Y amplitude
-
+pause -1
 unset multiplot
