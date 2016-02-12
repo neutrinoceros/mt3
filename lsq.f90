@@ -137,7 +137,7 @@ program lsq
     s = Nbr_of_parameter + i
     A(i) = Ampl(i)
     B(i) = Ampl(s)
-    write(12,*) A(i), B(i), i
+    write(12,*) A(i), B(i), sigma(i)
   end do
   close(unit=12)
 
