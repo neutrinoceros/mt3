@@ -18,7 +18,7 @@ mod_matrix.o : mod_matrix.f90
 	$(FC) -c $^ 
 
 run: lsq
-	./lsq
+	./lsq.exe
 
 ###
 clean:
