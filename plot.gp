@@ -1,7 +1,6 @@
 #Plot
 
 reset
-set termopt enhanced
 set nokey
 set multiplot 
 set size 1, 0.5
