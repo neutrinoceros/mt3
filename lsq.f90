@@ -70,10 +70,10 @@ program lsq
     !some data have 0.000 as error that meen tha the value is not true
     !we change this error in 100000. to kill this point
     if (errdX(j) .lt. 0.0009) then
-       errdX(j) = 100000.
+       errdX(j) = 1.e6_xi
     end if
     if (errdY(j) .lt. 0.0009) then
-       errdY(j) = 100000.
+       errdY(j) = 1.e6_xi
     end if
 
   end do
@@ -84,8 +84,11 @@ program lsq
   dXdY(Nbr_of_point+1:)=dY/errdY
 
   !conversion of time array : days -->julian century
-  t=t/36525.
+  t=(t-t2000)/Nbr_days_in_Century
 
+  ! do i=1,Nbr_of_point,1
+  !   print*,t(i)*36525._xi
+  ! end do
 
 !======================================================================  
 !Least Square Method
@@ -122,7 +125,8 @@ program lsq
     s = Nbr_of_parameter + i
     A(i) = Ampl(i)
     B(i) = Ampl(s)
-    print*,A(i), B(i)
+    ! print*,sigma(i)
+    print*,i, A(i), B(i)
   end do
   print*,
   
