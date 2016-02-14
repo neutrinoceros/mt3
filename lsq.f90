@@ -10,6 +10,7 @@ program lsq
 
   use arg_nut
   use mod_matrix
+  use mod_series
   implicit none
 
 !======================================================================  
@@ -44,6 +45,7 @@ program lsq
   real(kind=xi), dimension(Nbr_of_parameter) :: A, B
   integer :: i, j, k, r, s                                                 !iterators
   real(kind=xi) :: phase                                                   !instant phase used in matrix computation loop
+  complex(kind=xi), dimension(Nbr_of_point)   :: SrA, SrB, Sr              !results of the forier series of the amplitudes (series and MHB)
 
 !Read "ondes.txt" data  
   open (unit=15, file="data/ondes.txt", status='old')
@@ -140,6 +142,16 @@ program lsq
     write(12,*) A(i), B(i), sigma(i)
   end do
   close(unit=12)
+
+! Calculate the value of the X and Y from series and MHB 
+  open (unit=13,file="series.txt",status="replace")
+  do j = 1, Nbr_of_point
+    SrA(j) = ser(Nbr_of_parameter,A,B,sigma,phi,t(j))           !X and Y for the series
+    SrB(j) = ser(Nbr_of_parameter,ReMHB,ImMHB,sigma,phi,t(j))   !X and Y for the MHB
+    Sr(j) = SrA(j) + SrB(j)                                     !the sum of X and Y from series and MHB
+    write(13,*) real(Sr(j)), aimag(Sr(j)), dX(j), dY(j), t(j)
+  end do
+  close(unit=13)
 
   ! printing of slope and bias fitting results
   s = 2*Nbr_of_parameter + 1
