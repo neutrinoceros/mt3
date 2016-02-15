@@ -25,6 +25,7 @@ program lsq_457_days
   real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl !complex amplitude that we need to adjust
 
   integer :: array_size !variable using to compute the size of the amplitude and ampl_time array
+  integer :: midind, begind, endind !variable to search the middle, the begin and the end of the sliding window
   integer :: i, j, k, r, s !loop variable
   integer :: ios !checking io variable
 
@@ -76,14 +77,32 @@ program lsq_457_days
   !calculation of the amplitude at each time step!
   !----------------------------------------------!
 
-  amplitude_loop : do j=1,array_size,1
-    i=j
-    date=t(j)+time_step
+  j=1
+  i=1
+  amplitude_loop : do while (j<array_size)
+
     do while(t(i)<date) ! finding the next point 
       i=i+1
       if (i>array_size) exit amplitude_loop !avoiding overtaking momery
     end do 
+    midind=i
 
+    end_loop : do while(t(i)<(date+Slide_Window/2)) ! looking for the end of sliding window
+      i=i+1
+      if (i==array_size) exit 
+    end do end_loop 
+    endind=i
+
+    i=midind
+    begin_loop : do while(t(i)>(date - Slide_Window/2 )) ! looking for the begening of the slidind window
+      i=i-1
+      if (i==1) exit begin_loop
+    end do begin_loop
+    begind=i
+
+
+    j=midind
+    date=t(j)+time_step
   end do amplitude_loop
 
 
