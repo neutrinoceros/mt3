@@ -93,8 +93,11 @@ program lsq_457_days
   end do end_fit_loop
   end_fit=i
   !---------------------------------------------------------------------------------
+  print*,"array_size =", array_size
+  print*,"beg_fit =",beg_fit
+  print*,"end_fit =",end_fit
 
-
+  j=1 !indice to travel in amplitude and ampl_time array
   mid_win=beg_fit
   amplitude_loop : do while (mid_win<=end_fit)
     i=mid_win
@@ -113,7 +116,16 @@ program lsq_457_days
     end do begin_loop
     beg_win=i
 
-    !FIXME add here the porecessing of the fit
+    print*,beg_win,mid_win,end_win
+
+    !Porcessing the lsq in the previously calculate window
+    call processing_lsq_period (period,Nbr_of_parameter,(beg_win-end_win+1),&
+        dX(beg_win:end_win),dY(beg_win:end_win),errdX(beg_win:end_win),errdY(beg_win:end_win),&
+        t(beg_win:end_win),&
+        Ampl)
+    amplitude(j)=cmplx(Ampl(1),Ampl(2))  
+    !FIXME add the ampl_time asignation
+    !-----------------------------------------------------
 
     i=mid_win+1 !avoid infinite loop
     midle_loop : do while(t(i)<t(mid_win)+time_step .and. i < Nbr_of_point) ! finding the next point 
@@ -121,6 +133,11 @@ program lsq_457_days
     end do midle_loop
     mid_win=i
 
+    ! if(t(mid_win)-t(Nbr_of_point)<time_step) then
+    !   print*, "on sort de la boucle"
+    !   exit amplitude_loop
+    ! end if 
+    j=j+1
   end do amplitude_loop
 
 
