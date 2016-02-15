@@ -15,8 +15,8 @@ program lsq_457_days
 
   real(kind=xi), dimension(Nbr_of_point)   :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
 
-  real(kind=xi), dimension(:), allocatable :: amplitude, ampl_time !amplitude of the terme at 457days and corresponding time
-  real(kind=xi) :: date
+  complex(kind=xi),dimension(:),allocatable :: amplitude !amplitude of the terme at 457days 
+  real(kind=xi), dimension(:), allocatable  :: ampl_time !corresponding time
   
 
   real(kind=xi) :: var !reading variable
@@ -25,7 +25,9 @@ program lsq_457_days
   real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl !complex amplitude that we need to adjust
 
   integer :: array_size !variable using to compute the size of the amplitude and ampl_time array
-  integer :: midind, begind, endind !variable to search the middle, the begin and the end of the sliding window
+  integer :: mid_win, beg_win, end_win !variable to search the middle, the begin and the end of the sliding window
+  integer :: beg_fit, end_fit !indice of the first and last possible midle of the window
+
   integer :: i, j, k, r, s !loop variable
   integer :: ios !checking io variable
 
@@ -60,7 +62,7 @@ program lsq_457_days
   !sliding window!
   !--------------!
   !we use a sliding window to fit the amplitude of 457 days terme.
-  !the window is sliding by a step to have the valeu of the term at many date 
+  !the window is sliding by a step to have the valeu of the term at many t(j) 
   !==============!
 
 
@@ -77,32 +79,65 @@ program lsq_457_days
   !calculation of the amplitude at each time step!
   !----------------------------------------------!
 
-  j=1
+
+  !looking for the first and last point where we can put the entire window around it
   i=1
-  amplitude_loop : do while (j<array_size)
+  beg_fit_loop : do while (t(i)<(t(1)+Slide_Window/2))
+    i=i+1
+  end do beg_fit_loop
+  beg_fit=i
 
-    do while(t(i)<date) ! finding the next point 
-      i=i+1
-      if (i>array_size) exit amplitude_loop !avoiding overtaking momery
-    end do 
-    midind=i
+  i=Nbr_of_point
+  end_fit_loop : do while (t(i)>(t(Nbr_of_point)-Slide_Window/2))
+    i=i-1
+  end do end_fit_loop
+  end_fit=i
+  !---------------------------------------------------------------------------------
+  print*,"array_size =", array_size
+  print*,"beg_fit =",beg_fit
+  print*,"end_fit =",end_fit
 
-    end_loop : do while(t(i)<(date+Slide_Window/2)) ! looking for the end of sliding window
+  j=1 !indice to travel in amplitude and ampl_time array
+  mid_win=beg_fit
+  amplitude_loop : do while (mid_win<=end_fit)
+    i=mid_win
+
+    end_loop : do while(t(i)<(t(mid_win)+Slide_Window/2)) ! looking for the end of sliding window
       i=i+1
-      if (i==array_size) exit 
+      if (i==array_size) exit end_loop
     end do end_loop 
-    endind=i
+    end_win=i
 
-    i=midind
-    begin_loop : do while(t(i)>(date - Slide_Window/2 )) ! looking for the begening of the slidind window
+
+    i=mid_win
+    begin_loop : do while(t(i)>(t(mid_win) - Slide_Window/2 )) ! looking for the begening of the slidind window
       i=i-1
       if (i==1) exit begin_loop
     end do begin_loop
-    begind=i
+    beg_win=i
 
+    print*,beg_win,mid_win,end_win
 
-    j=midind
-    date=t(j)+time_step
+    !Porcessing the lsq in the previously calculate window
+    call processing_lsq_period (period,Nbr_of_parameter,(beg_win-end_win+1),&
+        dX(beg_win:end_win),dY(beg_win:end_win),errdX(beg_win:end_win),errdY(beg_win:end_win),&
+        t(beg_win:end_win),&
+        Ampl)
+    amplitude(j)=cmplx(Ampl(1),Ampl(2))  
+    !FIXME add the ampl_time asignation
+    !-----------------------------------------------------
+
+    i=mid_win+1 !avoid infinite loop
+    midle_loop : do while(t(i)<t(mid_win)+time_step .and. i < Nbr_of_point) ! finding the next point 
+      i=i+1
+    end do midle_loop
+    mid_win=i
+
+    ! if(t(mid_win)-t(Nbr_of_point)<time_step) then
+    !   print*, "on sort de la boucle"
+    !   exit amplitude_loop
+    ! end if 
+    j=j+1
   end do amplitude_loop
 
 

@@ -24,7 +24,8 @@ mod_lsq.o : mod_lsq.f90
 	$(FC) -c $^
 
 run: lsq lsq_457
-	./lsq.exe ./lsq_457.exe
+	./lsq.exe
+	./lsq_457.exe
 
 ###
 clean :
