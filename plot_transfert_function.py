@@ -8,8 +8,6 @@
 #       * etaR is complex nutation amplitudes from REN (Rigid Earth)
 #         columns 17 and 18 in ondes.txt
 #
-# NOTE : th_T does not show a resonance where it is supposed to ...
-#         fix it plz
 #
 #======================================================================
 
@@ -59,11 +57,16 @@ sigCW   =  1.816829e-7 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 sigNDFW = -7.308004e-5 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 
 
-def th_T(omega) : #fixme
+print 'sigNDFW =',sigNDFW
+print 'sigCW=',sigCW
+
+def th_T(sig) :
     """defined as eq 54 in "Drilling to the center of the Earth with VLBI" """
-    sigprime = omega/(2.0*np.pi)
-    sig = sigprime - Om
-    res = - (sig-eR*Om)/(eR*Om) * (kappa - Af/A * gamma - Am/A * sigCW/(sig - sigCW) + Af/A * (e - gamma) * (sigNDFW + Om)/(sig - sigNDFW))
+    res = - (sig-eR*Om)/(eR*Om) * (
+                                   (kappa - Af/A * gamma) 
+                                   - Am/A * sigCW/(sig - sigCW)
+                                   + Af/A * (e - gamma) * (sigNDFW + Om)/(sig - sigNDFW)
+                                   )
     return res
 
 
@@ -76,15 +79,15 @@ etaR = ondes_tab[:,0] + 1j * ondes_tab[:,0]
 etaC = (ondes_tab[:,2] + corrs_tab[:,0]) + 1j * ( ondes_tab[:,3] + corrs_tab[:,1] )
 transfert = np.array(etaC/etaR)
 
-mod = module(transfert)
-phi = argument(transfert)
-oms = corrs_tab[:,2]
+mod  = module(transfert)
+phi  = argument(transfert)
+sigs = corrs_tab[:,2]
 
 
 #def of theoretical values 
 #----------------------------------------
-oms_th = np.arange(min(oms),max(oms),1e-2)
-transfert_th = th_T(oms_th)
+sigs_th      = np.arange(-40000,40000,1e-1)
+transfert_th = th_T(sigs_th)
 mod_th       = module(transfert_th)
 phi_th       = argument(transfert_th)
 
@@ -94,27 +97,31 @@ phi_th       = argument(transfert_th)
 
 fig,axes = pl.subplots(nrows=2)
 
-axes[1].set_xlabel(r"$\omega$",size=20)
+axes[1].set_xlabel(r"$\sigma$",size=20)
 axes[1].set_ylabel(r"$\phi$"  ,size=20)
 axes[0].set_ylabel(r"$r$"     ,size=20)
-axes[0].set_ylim(min(mod)*0.9,max(mod)*1.1)
+axes[0].set_ylim(0,2)
 
 pl.ion()
 pl.show()
 
 #calculated tranfert function
 #----------------------------------------
-axes[0].scatter(oms,mod   ,marker="+")
-axes[1].scatter(oms,phi,marker='+',color='r')
+axes[0].scatter(sigs,mod,marker="+")
+axes[1].scatter(sigs,phi,marker='+',color='r')
 
 #theoretical tranfert function
 #----------------------------------------
-axes[0].plot(oms_th,mod_th,color='m')
-#axes[1].scatter(oms,phi_th,marker="*",color='m')   #useless : th_T returns reals, not complex
+axes[0].plot(sigs_th,mod_th,color='m')
+#axes[1].scatter(oms,phi_th,marker="*",color='m')   #useless : th_T returns reals, not complexs
 
-#theoretical resonances
+#theoretical asymptotes
 #----------------------------------------
-axes[0].plot(sigCW/(2*np.pi)*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k',lw=2)
+axes[0].plot(sigCW*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k')
+#axes[0].plot(sigNDFW*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k',lw=2)
+
+xxx=np.arange(min(sigs),max(sigs))
+axes[0].plot(xxx,(Am*sigCW/(A*eR*Om))*np.ones(len(xxx)), ls='--',c='k')
 
 pl.draw()
 pl.ioff()
