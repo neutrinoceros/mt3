@@ -23,8 +23,8 @@ mod_series.o : mod_series.f90
 mod_lsq.o : mod_lsq.f90
 	$(FC) -c $^
 
-run: lsq
-	./lsq.exe
+run: lsq lsq_457
+	./lsq.exe ./lsq_457.exe
 
 ###
 clean :
