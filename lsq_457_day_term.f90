@@ -154,7 +154,7 @@ program lsq_457_days
   
   do i = 1,array_size,1
     if(ampl_time(i)==0.0) exit
-    write(11,*) ampl_time(i), real(amplitude(i)), aimag(amplitude(i))
+    write(11,"(3e26.16)") ampl_time(i), real(amplitude(i)), aimag(amplitude(i))
   end do
 
   close(11)
