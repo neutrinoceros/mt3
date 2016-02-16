@@ -27,6 +27,7 @@ program lsq_457_days
   integer :: array_size !variable using to compute the size of the amplitude and ampl_time array
   integer :: mid_win, beg_win, end_win !variable to search the middle, the begin and the end of the sliding window
   integer :: beg_fit, end_fit !indice of the first and last possible midle of the window
+  integer :: med_win !median indice of the sliding window
 
   integer :: i, j, k, r, s !loop variable
   integer :: ios !checking io variable
@@ -73,8 +74,10 @@ program lsq_457_days
   array_size = floor((t(Nbr_of_point)-t(1))/time_step)
   allocate(amplitude(array_size))
   allocate(ampl_time(array_size))
+  ampl_time=0.0
   !------------------------------!
 
+  !----------------------------------------------!
   !----------------------------------------------!
   !calculation of the amplitude at each time step!
   !----------------------------------------------!
@@ -93,9 +96,9 @@ program lsq_457_days
   end do end_fit_loop
   end_fit=i
   !---------------------------------------------------------------------------------
-  print*,"array_size =", array_size
-  print*,"beg_fit =",beg_fit
-  print*,"end_fit =",end_fit
+  ! print*,"array_size =", array_size
+  ! print*,"beg_fit =",beg_fit
+  ! print*,"end_fit =",end_fit
 
   j=1 !indice to travel in amplitude and ampl_time array
   mid_win=beg_fit
@@ -116,16 +119,20 @@ program lsq_457_days
     end do begin_loop
     beg_win=i
 
-    print*,beg_win,mid_win,end_win
 
     !Porcessing the lsq in the previously calculate window
-    call processing_lsq_period (period,Nbr_of_parameter,(beg_win-end_win+1),&
+    call processing_lsq_period (period,Nbr_of_parameter,(end_win-beg_win+1),&
         dX(beg_win:end_win),dY(beg_win:end_win),errdX(beg_win:end_win),errdY(beg_win:end_win),&
         t(beg_win:end_win),&
         Ampl)
     amplitude(j)=cmplx(Ampl(1),Ampl(2))  
-    !FIXME add the ampl_time asignation
     !-----------------------------------------------------
+
+    !looking for the median time of th sliding window
+    med_win = (end_win - beg_win) / 2 + beg_win   
+    ampl_time(j)=t(med_win)
+    !------------------------------------------------
+    ! print*,beg_win,mid_win,end_win,med_win,amplitude(j)
 
     i=mid_win+1 !avoid infinite loop
     midle_loop : do while(t(i)<t(mid_win)+time_step .and. i < Nbr_of_point) ! finding the next point 
@@ -133,22 +140,29 @@ program lsq_457_days
     end do midle_loop
     mid_win=i
 
-    ! if(t(mid_win)-t(Nbr_of_point)<time_step) then
-    !   print*, "on sort de la boucle"
-    !   exit amplitude_loop
-    ! end if 
     j=j+1
   end do amplitude_loop
 
-
-
+  !----------------------------------------------!
   !----------------------------------------------!
 
-  !==============!
-  ! call processing_lsq_period(period,Nbr_of_parameter,Nbr_of_point,&
-  !    dX,dY,errdX,errdY,t,&
-  !    Ampl)
+  !------------!
+  !writing data!
+  !------------!
+  open(11,file="457_days_ampl.dat",status="replace",&
+    action="write",iostat=ios)
+  
+  do i = 1,array_size,1
+    if(ampl_time(i)==0.0) exit
+    write(11,*) ampl_time(i), real(amplitude(i)), aimag(amplitude(i))
+  end do
+
+  close(11)
+  !------------!
+
 
   deallocate(ampl_time)
   deallocate(amplitude)
+  !==============!
+
 end program lsq_457_days
