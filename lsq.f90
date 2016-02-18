@@ -144,11 +144,11 @@ program lsq
   close(unit=12)
 
 ! Calculate the value of the X and Y from series and MHB 
-  open (unit=13,file="series.txt",status="replace")
+  open (unit=13,file="series.dat",status="replace")
   do j = 1, Nbr_of_point
-    SrA(j) = ser(Nbr_of_parameter,A,B,sigma,phi,t(j))           !X and Y for the series
-    SrB(j) = ser(Nbr_of_parameter,ReMHB,ImMHB,sigma,phi,t(j))   !X and Y for the MHB
-    Sr(j) = SrA(j) + SrB(j)                                     !the sum of X and Y from series and MHB
+    SrA(j) = ser(Nbr_of_parameter,A,B,sigma,phi,t(j))         ! X and Y for the series
+    SrB(j) = ser(Nbr_of_parameter,ReMHB,ImMHB,sigma,phi,t(j)) ! X and Y for the MHB
+    Sr(j)  = SrA(j) + SrB(j)                                  ! the sum of X and Y from series and MHB
     write(13,*) real(Sr(j)), aimag(Sr(j)), dX(j), dY(j), t(j)
   end do
   close(unit=13)
