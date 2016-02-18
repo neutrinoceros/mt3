@@ -1,21 +1,30 @@
 Module mod_series
-
+  use arg_nut
   implicit none
 contains
-  function ser(N,A_re,A_im,sigma,phi,time)
+
+
+  complex (kind=xi) function ser(N,A_re,A_im,sigma,phi,time)
+    !Function to compute the value of the nutation with the complex coeficient A (which is pass by A_re and A_im)
+    !and sigma and phi at the time t
 
     implicit none
 
-    integer, parameter        :: xi = selected_real_kind (15)
-
-    complex(kind=xi) :: ser !return value of the function
+    !------------------------!
+    !argument of the function!
+    !------------------------!
     integer, intent(in) :: N !number of parameter
     real(kind=xi), dimension(N), intent(in) :: A_re, A_im !amplitude of the series
     real(kind=xi), dimension(N), intent(in) :: sigma, phi !frequence and phase of the amplitude
     real(kind=xi), intent(in) :: time !time to choose for the calculation
-    real(kind=xi) :: X, Y
+    !------------------------!
 
-    integer :: j
+    !--------------!
+    !local variable!
+    !--------------!
+    real(kind=xi) :: X, Y ! temporar variable in order to compute the real and the imaginary part of the nutation
+    integer :: j ! loop variable
+    !--------------!
 
     X = 0._xi
     Y = 0._xi
