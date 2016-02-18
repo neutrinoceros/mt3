@@ -29,7 +29,7 @@ run: lsq lsq_457
 
 ###
 clean :
-	rm *.o *.mod *.exe 2> /dev/null
+	rm *.dat *.o *.mod *.exe 2> /dev/null
 
 rebuild : clean all
 
