@@ -15,7 +15,7 @@ set title "The Change of Amplitude dX and dY"
 set xrange [-40000:40000] 
 set yrange [-0.05:0.04]
 set noxlabel
-set ylabel "dX"
+set ylabel "dX (mas)"
 plot 'amplitude.dat' u 5:1:3 w errorb pt 7 ps 0.1
 
 #Plotting in dY amplitude
@@ -23,8 +23,8 @@ set origin 0.0,0.0
 set notitle
 set xrange [-40000:40000] 
 set yrange [-0.05:0.04]
-set xlabel "Frequency"
-set ylabel "dY"
+set xlabel "Frequency (rad/JC)"
+set ylabel "dY (mas)"
 plot 'amplitude.dat' u 5:2:4 w errorb pt 7 ps 0.1
 
 unset multiplot
