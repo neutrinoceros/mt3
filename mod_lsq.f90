@@ -37,6 +37,8 @@ contains
     real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_parameter) :: MM, P !MM is equal to tranpose(M) matrix product M
     real(kind=xi), dimension(2*Nbr_of_parameter,2*Nbr_of_point)     :: Q, MMM
     real(kind=xi), dimension(2*Nbr_of_parameter)                    :: Ampl !complex amplitude that we need to adjust
+    real(kind=xi), dimension(2*Nbr_of_point) :: MA, tmpMa !matrix to compute the error
+    real(kind=xi) ::sigma_lsq ! residu
 
     integer :: i, j, k, r, s !loop variable
 
@@ -66,10 +68,18 @@ contains
     MMM = matmul(P,Q)
 
     amplitude_array = matmul(MMM,dXdY)
+
+    !processing the error
+    MA    = matmul(M,amplitude_array)
+    tmpMa = (dXdY-MA)**2
+    sigma_lsq = sqrt(sum(tmpMa))/(Nbr_of_point-Nbr_of_parameter)
+    
     do i = 1, 2*Nbr_of_parameter,1
       error_amplitude(i) = sqrt(P(i,i))
       ! print*, error_amplitude(i)
     end do
+
+    error_amplitude=error_amplitude*sigma_lsq
 
 
   end subroutine processing_lsq_period
