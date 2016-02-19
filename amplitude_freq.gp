@@ -2,9 +2,8 @@
 
 #definition of the environement of the gnuplot
 reset
-#set terminal pdf color
-set terminal x11
-#set output "pictures/amplitude_freq.pdf"
+set terminal pdf color
+set output "pictures/amplitude_freq.pdf"
 set nokey
 set multiplot 
 set size 1, 0.5
@@ -23,5 +22,4 @@ set xlabel "Frequency"
 set ylabel "dY"
 plot 'amplitude.dat' u 5:2:4 w errorb pt 7 ps 0.7
 
-pause -1
 unset multiplot
