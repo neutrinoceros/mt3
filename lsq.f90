@@ -136,6 +136,7 @@ program lsq
 ! Calculate corrections to complex amplitudes in the model
   Ampl = matmul(MMM,dXdY)
   open (unit=12,file="amplitude.dat",status="replace")
+  write(12,fmt='(5 A26)') "#dX", "dY", "dX_error", "dY_error", "Frequency"
   do i=1,Nbr_of_parameter
     s = Nbr_of_parameter + i
 
@@ -144,17 +145,18 @@ program lsq
     errA(i) = P(i,i)**2
     errB(i) = P(s,s)**2
 
-    write(12,fmt='(5 E16.7)') A(i), B(i), errA(i), errB(i),sigma(i)
+    write(12,fmt='(5 E26.16)') A(i), B(i), errA(i), errB(i),sigma(i)
   end do
   close(unit=12)
 
 ! Calculate the value of the X and Y from series and MHB 
   open (unit=13,file="series.dat",status="replace")
+  write(13,fmt='(5 A26)') "#dX (series + MHB)", "dY (series + MHB)", "dX (observation)", "dY (observation)", "time"
   do j = 1, Nbr_of_point
     SrA(j) = ser(Nbr_of_parameter,A,B,sigma,phi,t(j))         ! X and Y for the series
     SrB(j) = ser(Nbr_of_parameter,ReREN,ImREN,sigma,phi,t(j)) ! X and Y for the MHB
     Sr(j)  = SrA(j) !+ SrB(j)                                  ! the sum of X and Y from series and MHB
-    write(13,fmt='(5 E16.7)') real(Sr(j)), aimag(Sr(j)), dX(j), dY(j), t(j)
+    write(13,fmt='(5 E26.16)') real(Sr(j)), aimag(Sr(j)), dX(j), dY(j), t(j)
   end do
   close(unit=13)
 
