@@ -33,3 +33,6 @@ clean :
 
 rebuild : clean all
 
+
+rerun : clean run
+
