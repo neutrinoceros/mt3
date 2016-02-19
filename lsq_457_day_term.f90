@@ -16,13 +16,15 @@ program lsq_457_days
   real(kind=xi), dimension(Nbr_of_point)   :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
 
   complex(kind=xi),dimension(:),allocatable :: amplitude !amplitude of the terme at 457days 
+  complex(kind=xi),dimension(:),allocatable :: err_ampl ! contains the error in the lsq processing x=real, y=im
   real(kind=xi), dimension(:), allocatable  :: ampl_time !corresponding time
-  
+
 
   real(kind=xi) :: var !reading variable
   character(20) :: carc !reading variable
 
   real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl !complex amplitude that we need to adjust
+  real(kind=xi), dimension(2*Nbr_of_parameter) :: Ampl_error !complex error in the lsq
 
   integer :: array_size !variable using to compute the size of the amplitude and ampl_time array
   integer :: mid_win, beg_win, end_win !variable to search the middle, the begin and the end of the sliding window
@@ -43,17 +45,17 @@ program lsq_457_days
 
   do j=1,Nbr_of_point
     read (10,*) t(j), var, var, var, dX(j), dY(j), var, var, &
-         carc, errdX(j), errdY(j), carc, var, var, var, corrdXdY(j), &
-         var, carc, var, var, var, var, var, var, var, var, &
-         var, var, var, var, carc
-    
+      carc, errdX(j), errdY(j), carc, var, var, var, corrdXdY(j), &
+      var, carc, var, var, var, var, var, var, var, var, &
+      var, var, var, var, carc
+
     !some data have 0.000 as error that meen tha the value is not true
     !we change this error in 100000. to kill this point
     if (errdX(j) .lt. 0.0009) then
-       errdX(j) = 100000.
+      errdX(j) = 100000.
     end if
     if (errdY(j) .lt. 0.0009) then
-       errdY(j) = 100000.
+      errdY(j) = 100000.
     end if
 
   end do
@@ -73,6 +75,7 @@ program lsq_457_days
   !array may be too big for the result but never too small (normaly)
   array_size = floor((t(Nbr_of_point)-t(1))/time_step)
   allocate(amplitude(array_size))
+  allocate(err_ampl(array_size))
   allocate(ampl_time(array_size))
   ampl_time=0.0
   !------------------------------!
@@ -122,15 +125,17 @@ program lsq_457_days
 
     !Porcessing the lsq in the previously calculate window
     call processing_lsq_period (period,Nbr_of_parameter,(end_win-beg_win+1),&
-        dX(beg_win:end_win),dY(beg_win:end_win),errdX(beg_win:end_win),errdY(beg_win:end_win),&
-        t(beg_win:end_win),&
-        Ampl)
-    amplitude(j)=cmplx(Ampl(1),Ampl(2))  
+      dX(beg_win:end_win),dY(beg_win:end_win),errdX(beg_win:end_win),errdY(beg_win:end_win),&
+      t(beg_win:end_win),&
+      Ampl, Ampl_error)
+    amplitude(j)=cmplx(Ampl(1),Ampl(2))
+    err_ampl(j)=cmplx(Ampl_error(1),Ampl_error(2))
     !-----------------------------------------------------
 
     !looking for the median time of th sliding window
     med_win = (end_win - beg_win) / 2 + beg_win   
     ampl_time(j)=t(med_win)
+    
     !------------------------------------------------
     ! print*,beg_win,mid_win,end_win,med_win,amplitude(j)
 
@@ -151,10 +156,12 @@ program lsq_457_days
   !------------!
   open(11,file="457_days_ampl.dat",status="replace",&
     action="write",iostat=ios)
-  
+
+  write(11,fmt='(5A26)'),"#time","X amplitude","Y amplitude","X erreur","Y erreur"
+
   do i = 1,array_size,1
     if(ampl_time(i)==0.0) exit
-    write(11,"(3e26.16)") ampl_time(i), real(amplitude(i)), aimag(amplitude(i))
+    write(11,"(5e26.16)") ampl_time(i), real(amplitude(i)), aimag(amplitude(i)), real(err_ampl(i)),aimag(err_ampl(i))
   end do
 
   close(11)
@@ -162,6 +169,7 @@ program lsq_457_days
 
 
   deallocate(ampl_time)
+  deallocate(err_ampl)
   deallocate(amplitude)
   !==============!
 

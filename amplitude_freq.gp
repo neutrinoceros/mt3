@@ -2,8 +2,9 @@
 
 #definition of the environement of the gnuplot
 reset
+set terminal latex
 set terminal pdf color
-set output "pictures/fit_amplitude.pdf"
+set output "pictures/amplitude_freq.pdf"
 set nokey
 set multiplot 
 set size 1, 0.5
@@ -11,14 +12,19 @@ set size 1, 0.5
 #Plotting in dX amplitude
 set origin 0.0,0.5
 set title "The Change of Amplitude dX and dY"
-set noxlabel 
-set ylabel "dX"
-plot 'amplitude.dat' u 3:1 w linespoints lc 1
+set xrange [-40000:40000] 
+set yrange [-0.05:0.04]
+set noxlabel
+set ylabel "dX (mas)"
+plot 'amplitude.dat' u 5:1:3 w errorb pt 7 ps 0.1
 
 #Plotting in dY amplitude
 set origin 0.0,0.0
 set notitle
-set xlabel "Number of Amplitude"
-set ylabel "dY"
-plot 'amplitude.dat' u 3:2 w linespoints lc 2	
+set xrange [-40000:40000] 
+set yrange [-0.05:0.04]
+set xlabel "Frequency (rad/JC)"
+set ylabel "dY (mas)"
+plot 'amplitude.dat' u 5:2:4 w errorb pt 7 ps 0.1
+
 unset multiplot
