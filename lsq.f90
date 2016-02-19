@@ -151,8 +151,8 @@ program lsq
 
     A(i)    = Ampl(i)
     B(i)    = Ampl(s)
-    errA(i) = sqrt(P(i,i)) * sigma_lsq
-    errB(i) = sqrt(P(s,s)) * sigma_lsq
+    errA(i) = sqrt(P(i,i) * sigma_lsq)
+    errB(i) = sqrt(P(s,s) * sigma_lsq)
 
     write(12,fmt='(5 E26.16)') A(i), B(i), errA(i), errB(i),sigma(i)
   end do

@@ -157,6 +157,8 @@ program lsq_457_days
   open(11,file="457_days_ampl.dat",status="replace",&
     action="write",iostat=ios)
 
+  write(11,fmt='(5A26)'),"#time","X amplitude","Y amplitude","X erreur","Y erreur"
+
   do i = 1,array_size,1
     if(ampl_time(i)==0.0) exit
     write(11,"(5e26.16)") ampl_time(i), real(amplitude(i)), aimag(amplitude(i)), real(err_ampl(i)),aimag(err_ampl(i))

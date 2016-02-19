@@ -72,7 +72,7 @@ contains
     !processing the error
     MA    = matmul(M,amplitude_array)
     tmpMa = (dXdY-MA)**2
-    sigma_lsq = sqrt(sum(tmpMa))/(Nbr_of_point-Nbr_of_parameter)
+    sigma_lsq = sqrt(sum(tmpMa)/(Nbr_of_point-Nbr_of_parameter))
     
     do i = 1, 2*Nbr_of_parameter,1
       error_amplitude(i) = sqrt(P(i,i))
