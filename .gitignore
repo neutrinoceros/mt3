@@ -1,8 +1,8 @@
 #misc
 *.pyc
+*.py~
 *#
-.dat
-
+*.dat
 
 # Compiled Object files
 *.slo
