@@ -9,66 +9,19 @@
 #         columns 17 and 18 in ondes.txt
 #
 #
+# also fits some parameters of the transert function :
+#  * kappa (complex)
+#  * sigCW and sigNDFW (complex)
+#  * e (real)
+#
+# Note : e should be real but is treated as a complex for now (much simpler)
 #======================================================================
 
 import numpy as np
 import pylab as pl
+import numpy.linalg as la
 
-#defintion of usefull functions
-#======================================================================
-
-def module(z) :
-    return (z.real**2 + z.imag**2)**(1./2)
-
-def argument(z) :
-    return np.arcsin(z.imag/module(z))
-
-#defintion of theoretical transfert function
-#======================================================================
-
-jc2d = 36525      #conversion factor from julian centuries to days
-d2s  = 24*3600    #conversion factor from days to seconds
-
-#numerical values extracted from table 1 :
-#-------------------------------------------------------------------
-
-#rigid earth flattening
-eR    = 0.0032845075
-
-#Earth's rotation rate (rad.s^-1) ---> (rad.jc^-1)
-Om    = 7.292115e-5 * d2s * jc2d
-
-#Moments of inertia (kg.m^2)
-A     = 8.0115e37
-Am    = 7.0999e37
-Af    = 9.0583e37
-
-#ellipticities
-e     = 3.257e-3
-
-#Compliances
-kappa = 1.039e-3
-gamma = 1.965e-3
-
-
-#other numerical values 
-#-------------------------------------------------------------------
-sigCW   =  1.816829e-7 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
-sigNDFW = -7.308004e-5 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
-
-
-print 'sigNDFW =',sigNDFW
-print 'sigCW=',sigCW
-
-def th_T(sig) :
-    """defined as eq 54 in "Drilling to the center of the Earth with VLBI" """
-    res = - (sig-eR*Om)/(eR*Om) * (
-                                   (kappa - Af/A * gamma) 
-                                   - Am/A * sigCW/(sig - sigCW)
-                                   + Af/A * (e - gamma) * (sigNDFW + Om)/(sig - sigNDFW)
-                                   )
-    return res
-
+from transfert import *
 
 #data loading
 #======================================================================
@@ -84,12 +37,34 @@ phi  = argument(transfert)
 sigs = corrs_tab[:,2]
 
 
+#resol obs = M*p1 (find p1)
+#======================================================================
+
+obs = transfert - th_T(sigs)
+M = np.zeros((len(obs),4))
+M[:,0] = dTkappa(sigs)
+M[:,1] = dTsigCW(sigs)
+M[:,2] = dTe(sigs)
+M[:,3] = dTsigNDFW(sigs)
+
+p1 = la.lstsq(M,obs)[0]
+print p1
+
 #def of theoretical values 
 #----------------------------------------
-sigs_th      = np.arange(-40000,40000,1e-1)
+sigMIN       = -4e4
+sigMAX       = -sigMIN 
+sigs_th      = np.arange(sigMIN,sigMAX,1e-1)
 transfert_th = th_T(sigs_th)
 mod_th       = module(transfert_th)
 phi_th       = argument(transfert_th)
+
+
+#def of theoretical values  (postfit)
+#----------------------------------------
+transfert_pf = th_T(sigs_th,p1)
+mod_pf       = module(transfert_pf)
+phi_pf       = argument(transfert_pf)
 
 
 #plot script
@@ -113,15 +88,17 @@ axes[1].scatter(sigs,phi,marker='+',color='r')
 #theoretical tranfert function
 #----------------------------------------
 axes[0].plot(sigs_th,mod_th,color='m')
-#axes[1].scatter(oms,phi_th,marker="*",color='m')   #useless : th_T returns reals, not complexs
+axes[0].plot(sigs_th,mod_pf,color='g')
+#axes[1].plot(sigs_th,phi_th,marker="*",color='m')   #useless : th_T returns reals, not complexs
+axes[1].plot(sigs_th,phi_pf,color='g')   
 
 #theoretical asymptotes
 #----------------------------------------
-axes[0].plot(sigCW*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k')
+#axes[0].plot((sigNDFW+Om)*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k')
 #axes[0].plot(sigNDFW*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k',lw=2)
 
-xxx=np.arange(min(sigs),max(sigs))
-axes[0].plot(xxx,(Am*sigCW/(A*eR*Om))*np.ones(len(xxx)), ls='--',c='k')
+#xxx = np.arange(min(sigs),max(sigs))
+#axes[0].plot(xxx,(Am*sigCW/(A*eR*Om))*np.ones(len(xxx)), ls='--',c='k')
 
 pl.draw()
 pl.ioff()
