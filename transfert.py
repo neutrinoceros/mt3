@@ -54,7 +54,7 @@ sigNDFW = -7.308004e-5 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 
 #theoretical transfert function
 #--------------------------------------------------
-def th_T(sig0,p1=[0.,0.,0.,0.]) :
+def th_T(sig0,p1=np.zeros(4)) :
     """defined as eq 54 in "Drilling to the center of the Earth with VLBI" """
     sig = sig0 - Om
     res = - (sig-eR*Om)/(eR*Om) * (

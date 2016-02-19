@@ -13,6 +13,8 @@
 #  * kappa (complex)
 #  * sigCW and sigNDFW (complex)
 #  * e (real)
+#
+# Note : e should be real but is treated as a complex for now (much simpler)
 #======================================================================
 
 import numpy as np
@@ -92,7 +94,7 @@ axes[1].plot(sigs_th,phi_pf,color='g')
 
 #theoretical asymptotes
 #----------------------------------------
-axes[0].plot((sigNDFW+Om)*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k')
+#axes[0].plot((sigNDFW+Om)*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k')
 #axes[0].plot(sigNDFW*np.ones(2),[min(mod)/5,max(mod)*2], ls='--',c='k',lw=2)
 
 #xxx = np.arange(min(sigs),max(sigs))
