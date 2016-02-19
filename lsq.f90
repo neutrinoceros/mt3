@@ -40,6 +40,8 @@ program lsq
   real(kind=xi), dimension(2*Nbr_of_parameter + 4,2*Nbr_of_parameter + 4) :: MM, P !MM is equal to tranpose(M) matrix product M
   real(kind=xi), dimension(2*Nbr_of_parameter + 4,2*Nbr_of_point) :: Q, MMM
   real(kind=xi), dimension(2*Nbr_of_parameter + 4) :: Ampl                         !complex amplitude that we need to adjust
+  real(kind=xi), dimension(2*Nbr_of_point) :: M_dot_amp, tmpMa !matrix to compute the error
+  real(kind=xi) ::sigma_lsq ! residu
 
 
   real(kind=xi), dimension(Nbr_of_parameter) :: A, B
@@ -133,18 +135,25 @@ program lsq
   P = inv(MM)      ! matrix inversion using function defined in mod_matrix.f90
   MMM = matmul(P,Q)
 
+
 ! Calculate corrections to complex amplitudes in the model
   Ampl = matmul(MMM,dXdY)
+
+  ! processing the error on lsq
+  M_dot_amp = matmul(M,Ampl)
+  tmpMa = (dXdY-M_dot_amp)**2
+  sigma_lsq = sqrt(sum(tmpMa))/(Nbr_of_point-Nbr_of_parameter)
+
   open (unit=12,file="amplitude.dat",status="replace")
   do i=1,Nbr_of_parameter
     s = Nbr_of_parameter + i
 
     A(i)    = Ampl(i)
     B(i)    = Ampl(s)
-    errA(i) = P(i,i)**2
-    errB(i) = P(s,s)**2
+    errA(i) = sqrt(P(i,i)) * sigma_lsq
+    errB(i) = sqrt(P(s,s)) * sigma_lsq
 
-    write(12,fmt='(5 E16.7)') A(i), B(i), errA(i), errB(i),sigma(i)
+    write(12,fmt='(5 E26.16)') A(i), B(i), errA(i), errB(i),sigma(i)
   end do
   close(unit=12)
 
