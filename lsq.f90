@@ -43,6 +43,7 @@ program lsq
 
 
   real(kind=xi), dimension(Nbr_of_parameter) :: A, B
+  real(kind=xi), dimension(Nbr_of_parameter) :: errA,errB
   integer :: i, j, k, r, s                                                 !iterators
   real(kind=xi) :: phase                                                   !instant phase used in matrix computation loop
   complex(kind=xi), dimension(Nbr_of_point)   :: SrA, SrB, Sr              !results of the forier series of the amplitudes (series and MHB)
@@ -137,9 +138,13 @@ program lsq
   open (unit=12,file="amplitude.dat",status="replace")
   do i=1,Nbr_of_parameter
     s = Nbr_of_parameter + i
-    A(i) = Ampl(i)
-    B(i) = Ampl(s)
-    write(12,*) A(i), B(i), sigma(i)
+
+    A(i)    = Ampl(i)
+    B(i)    = Ampl(s)
+    errA(i) = P(i,i)**2
+    errB(i) = P(s,s)**2
+
+    write(12,fmt='(5 E16.7)') A(i), B(i), errA(i), errB(i),sigma(i)
   end do
   close(unit=12)
 
@@ -147,9 +152,9 @@ program lsq
   open (unit=13,file="series.dat",status="replace")
   do j = 1, Nbr_of_point
     SrA(j) = ser(Nbr_of_parameter,A,B,sigma,phi,t(j))         ! X and Y for the series
-    SrB(j) = ser(Nbr_of_parameter,ReMHB,ImMHB,sigma,phi,t(j)) ! X and Y for the MHB
-    Sr(j)  = SrA(j) + SrB(j)                                  ! the sum of X and Y from series and MHB
-    write(13,*) real(Sr(j)), aimag(Sr(j)), dX(j), dY(j), t(j)
+    SrB(j) = ser(Nbr_of_parameter,ReREN,ImREN,sigma,phi,t(j)) ! X and Y for the MHB
+    Sr(j)  = SrA(j) !+ SrB(j)                                  ! the sum of X and Y from series and MHB
+    write(13,fmt='(5 E16.7)') real(Sr(j)), aimag(Sr(j)), dX(j), dY(j), t(j)
   end do
   close(unit=13)
 
@@ -160,5 +165,4 @@ program lsq
   print*, Ampl(s:s+3)
 
   print*,
-  
 end program lsq
