@@ -7,7 +7,7 @@ contains
   !module to compute 
   subroutine processing_lsq_period (periode,Nbr_of_parameter,Nbr_of_point,&
       measure_array_X,measure_array_Y,error_array_X,error_array_Y,time,&
-      amplitude_array)
+      amplitude_array,error_amplitude)
     !Subroutine to processe the amplitude of 457 days nutation periode
     implicit none
 
@@ -22,6 +22,7 @@ contains
     real(kind=xi),dimension(Nbr_of_point), intent (in) :: time !time of th measure array
 
     real(kind=xi),dimension(2*Nbr_of_parameter), intent(out) :: amplitude_array ! amplitude we want to process 
+    real(kind=xi),dimension(2*Nbr_of_parameter), intent(out) :: error_amplitude !error in the amplitude processing by lsq
     !========================!
 
     !==============!
@@ -65,6 +66,10 @@ contains
     MMM = matmul(P,Q)
 
     amplitude_array = matmul(MMM,dXdY)
+    do i = 1, 2*Nbr_of_parameter,1
+      error_amplitude(i) = sqrt(P(i,i))
+      ! print*, error_amplitude(i)
+    end do
 
 
   end subroutine processing_lsq_period
