@@ -5,6 +5,7 @@ program lsq_457_days
   use arg_nut
   use mod_matrix
   use mod_lsq
+  use mod_series
   implicit none
 
 
@@ -13,7 +14,8 @@ program lsq_457_days
   real (kind=xi),parameter :: time_step =365.
   real (kind=xi),parameter :: Slide_Window = 2.*365. !days, it is the windows where we process the amplitude
 
-  real(kind=xi), dimension(Nbr_of_point)   :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
+  real(kind=xi), dimension(Nbr_of_point) :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
+  real(kind=xi), dimension(Nbr_of_point) :: X_457,Y_457 
 
   complex(kind=xi),dimension(:),allocatable :: amplitude !amplitude of the terme at 457days 
   complex(kind=xi),dimension(:),allocatable :: err_ampl ! contains the error in the lsq processing x=real, y=im
@@ -167,10 +169,30 @@ program lsq_457_days
   close(11)
   !------------!
 
+  !interpolation with python script
+  call system('python interpolate_457_days_term.py')
+  ! call system ('./interpolate_457_days_term.py')
 
   deallocate(ampl_time)
   deallocate(err_ampl)
   deallocate(amplitude)
   !==============!
+
+  !================================================!
+  !Removing the 457 days term in the series of data!
+  !================================================!
+  open(11,file='interpolated_457d_amps.dat',status='old',&
+    action='read',iostat=ios)
+  if (ios /= 0) stop "error in opening interpolated_457d_amps.dat"
+  
+  do i = 1,Nbr_of_point,1
+    read(11,*) X_457(i),Y_457(i)
+  end do
+
+  close(11)
+  !================================================!
+
+  call system('rm interpolated_457d_amps.dat')
+
 
 end program lsq_457_days
