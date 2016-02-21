@@ -43,24 +43,29 @@ e     = 3.257e-3
 #Compliances
 kappa = 1.039e-3
 gamma = 1.965e-3
-
+beta  = 6.160e-4
 
 #other numerical values 
 #-------------------------------------------------------------------
 sigCW   =  1.816829e-7 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 sigNDFW = -7.308004e-5 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 
-
+def update_resonnances(new_e,new_kappa) :
+    sigCW   = Om*A/Am*(new_e-new_kappa)
+    sigNDFW = - Om*(1-A/Am*(ef-beta))
 
 #theoretical transfert function
 #--------------------------------------------------
-def th_T(sig0,p1=np.zeros(4)) :
+def th_T(sig0,p1=np.zeros(5)) :
     """defined as eq 54 in "Drilling to the center of the Earth with VLBI" """
     sig = sig0 - Om
+    kkappa = kappa + p1[0] + 1j*p1[1]
+    ggamma = gamma + p1[2] + 1j*p1[3]
+    ee     = e + p1[4]
     res = - (sig-eR*Om)/(eR*Om) * (
-                                   ((kappa+p1[0]) - Af/A * gamma) 
-                                   - Am/A * (sigCW+p1[1])/(sig - (sigCW+p1[1]))
-                                   + Af/A * ((e+p1[2]) - gamma) * ((sigNDFW+p1[3]) + Om)/(sig - (sigNDFW+p1[3]))
+                                   (kkappa - Af/A * ggamma)
+                                   - Am/A * sigCW/(sig - sigCW)
+                                   + Af/A * (ee - ggamma) * (sigNDFW + Om)/(sig - (sigNDFW))
                                    )
     return res
 
@@ -68,23 +73,36 @@ def th_T(sig0,p1=np.zeros(4)) :
 #partial derivatives of theoretical transfert function
 #------------------------------------------------------
 
-def dTkappa(sig0) :
+def dTkappa_r(sig0) :
     sig = sig0 - Om
     res = - (sig-eR*Om)/(eR*Om)
     return res
 
-def dTsigCW(sig0) :
+def dTkappa_i(sig0) :
+    return 1j*dTkappa_r
+
+def dTgamma_r(sig0) :
     sig = sig0 - Om
-    res = (sig-eR*Om)/(eR*Om) * Am/A * sig/(sig - sigCW)**2
+    res = (sig-eR*Om)/(eR*Om) * Af/A * (1+(sigNDFW + Om)/(sig - sigNDFW))
     return res
+
+def dTgamma_i(sig0) :
+    return 1j*dTgamma_r
 
 def dTe(sig0) :
     sig = sig0 - Om
     res = - (sig-eR*Om)/(eR*Om) * Af/A * (sigNDFW + Om)/(sig - sigNDFW)
     return res
 
-def dTsigNDFW(sig0) :
-    sig = sig0 - Om
-    res = - (sig-eR*Om)/(eR*Om) * Af/A * (e - gamma) * (sig)/(sig - sigNDFW)**2
-    return res
+
+# def dTsigCW(sig0) :
+#     sig = sig0 - Om
+#     res = (sig-eR*Om)/(eR*Om) * Am/A * sig/(sig - sigCW)**2
+#     return res
+
+
+# def dTsigNDFW(sig0) :
+#     sig = sig0 - Om
+#     res = - (sig-eR*Om)/(eR*Om) * Af/A * (e - gamma) * (sig)/(sig - sigNDFW)**2
+#     return res
 
