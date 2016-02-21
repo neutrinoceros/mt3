@@ -42,10 +42,11 @@ sigs = corrs_tab[:,2]
 
 obs = transfert - th_T(sigs)
 M = np.zeros((len(obs),4))
-M[:,0] = dTkappa(sigs)
-M[:,1] = dTsigCW(sigs)
-M[:,2] = dTe(sigs)
-M[:,3] = dTsigNDFW(sigs)
+M[:,0] = dTkappa_r(sigs)
+M[:,1] = dTkappa_i(sigs)
+M[:,2] = dTgamma_r(sigs)
+M[:,3] = dTgamma_i(sigs)
+M[:,4] = dTe      (sigs)
 
 p1 = la.lstsq(M,obs)[0]
 print p1
