@@ -17,7 +17,7 @@ program lsq
 ! Variables declaration
 !======================================================================  
 
-  integer,parameter::Nbr_of_point=5980,Nbr_of_parameter=42
+  integer,parameter::Nbr_of_point=5981,Nbr_of_parameter=42
   integer, dimension(Nbr_of_parameter) :: l,ls,F,D,Om                          !integer multiplicative coefficent to process modeling pulsation
   real (kind=xi), dimension(Nbr_of_parameter) :: ReREN,ImREN,ReMHB,ImMHB,    &
     sigma,phi                                                                  !reading variables not used in the code

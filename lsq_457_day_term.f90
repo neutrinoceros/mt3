@@ -9,7 +9,7 @@ program lsq_457_days
   implicit none
 
 
-  integer,parameter        :: Nbr_of_point=5980,Nbr_of_parameter=1
+  integer,parameter        :: Nbr_of_point=5981,Nbr_of_parameter=1
   real (kind=xi),parameter :: period=457._xi!days period wich we want to fit the complex amplitude
   real (kind=xi),parameter :: time_step =365.
   real (kind=xi),parameter :: Slide_Window = 2.*365. !days, it is the windows where we process the amplitude
