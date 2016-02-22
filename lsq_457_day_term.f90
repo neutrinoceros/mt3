@@ -9,13 +9,14 @@ program lsq_457_days
   implicit none
 
 
-  integer,parameter        :: Nbr_of_point=5980,Nbr_of_parameter=1
+  integer,parameter        :: Nbr_of_point=5981,Nbr_of_parameter=1
   real (kind=xi),parameter :: period=457._xi!days period wich we want to fit the complex amplitude
   real (kind=xi),parameter :: time_step =365.
   real (kind=xi),parameter :: Slide_Window = 2.*365. !days, it is the windows where we process the amplitude
 
   real(kind=xi), dimension(Nbr_of_point) :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
   real(kind=xi), dimension(Nbr_of_point) :: X_457,Y_457 
+  real(kind=xi), dimension(Nbr_of_point) :: dX_clean, dY_clean
 
   complex(kind=xi),dimension(:),allocatable :: amplitude !amplitude of the terme at 457days 
   complex(kind=xi),dimension(:),allocatable :: err_ampl ! contains the error in the lsq processing x=real, y=im
@@ -194,5 +195,19 @@ program lsq_457_days
 
   call system('rm interpolated_457d_amps.dat')
 
+  !erasing the 457 days signal off the observe nutation
+  dX_clean=dX-X_457
+  dY_clean=dY-Y_457
+  !----------------------------------------------------
+
+  open(13,file='data_clean_off_457.dat',status='replace',&
+    action='write',iostat=ios)
+  if(ios /=0) stop "pb ouverture data_clean_off_457.dat"
+  write(13,fmt='(3a26)')"#time","dx","dY"
+  do i = 1,Nbr_of_point,1
+    write(13,fmt='(3e26.16)') t(i), dX_clean(i), dY_clean(i) 
+  end do
+
+  close(13)
 
 end program lsq_457_days
