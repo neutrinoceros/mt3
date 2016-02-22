@@ -10,6 +10,9 @@ import fft_processing as ft
 #then we apply the fft to the interpolated data in order to fine the resonance frequence of nutation
 #===================================================================================================#
 
+data_clean = np.loadtxt("../data_clean_off_457.dat")#contain the data clean 457 days term
+dX_clean = data_clean[:,1]
+dY_clean = data_clean[:,2]
 
 data=np.genfromtxt("../data/opa2015a.eops",usecols=(0,4,5,9,10))
 data[:,0]=data[:,0]-data[0,0]
@@ -24,8 +27,11 @@ data[:,0]=data[:,0]-data[0,0]
 #trying to kill some aberant point
 dX_array=data[:,1] 
 dY_array=data[:,2]
-dX_array=dX_array-np.average(dX_array)
-dY_array=dY_array-np.average(dY_array)
+
+dX_array = dX_array - np.average(dX_array)
+dY_array = dY_array - np.average(dY_array)
+dX_clean = dX_clean - np.average(dX_clean)
+dY_clean = dY_clean - np.average(dY_clean)
 
 dX_sigma=data[:,3]
 dY_sigma=data[:,4]
@@ -39,9 +45,16 @@ sample_step=15 #days
 interpolated_time_X,interpolated_dX=intp.interpolation_function(data_time,dX_array,dX_sigma,interp_time_step=sample_step)
 interpolated_time_Y,interpolated_dY=intp.interpolation_function(data_time,dY_array,dY_sigma,interp_time_step=sample_step)
 
+interpolated_time_X_clean,interpolated_dX_clean = intp.interpolation_function(data_time,dX_clean,dX_sigma,interp_time_step=sample_step)
+interpolated_time_Y_clean,interpolated_dY_clean = intp.interpolation_function(data_time,dY_clean,dY_sigma,interp_time_step=sample_step)
+
+
 #temporal offset put to zero
 interpolated_time_X=interpolated_time_X[:]-interpolated_time_X[0]
 interpolated_time_Y=interpolated_time_Y[:]-interpolated_time_Y[0]
+
+interpolated_time_X_clean=interpolated_time_X_clean[:]-interpolated_time_X_clean[0]
+interpolated_time_Y_clean=interpolated_time_Y_clean[:]-interpolated_time_Y_clean[0]
 
 # print "temps interp X =",interpolated_time_X
 # print "valeur signal X =",interpolated_dX
@@ -50,6 +63,10 @@ interpolated_time_Y=interpolated_time_Y[:]-interpolated_time_Y[0]
 #fft processing
 frequence_X,spectral_X=ft.processing_fft(interpolated_time_X,interpolated_dX,sample_step)
 frequence_Y,spectral_Y=ft.processing_fft(interpolated_time_Y,interpolated_dY,sample_step)
+
+
+frequence_X_clean,spectral_X_clean=ft.processing_fft(interpolated_time_X_clean,interpolated_dX_clean,sample_step)
+frequence_Y_clean,spectral_Y_clean=ft.processing_fft(interpolated_time_Y_clean,interpolated_dY_clean,sample_step)
 
 
 ################
