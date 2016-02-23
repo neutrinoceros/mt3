@@ -50,9 +50,9 @@ contains
       s = Nbr_of_point + j
 
       M(j,1) = 1./error_array_X(j)*cos(sigma*time(j))
-      M(j,2) = 1./error_array_X(j)*sin(sigma*time(j))
+      M(j,2) = -1./error_array_X(j)*sin(sigma*time(j))
 
-      M(s,1) = -1./error_array_Y(j)*sin(sigma*time(j))
+      M(s,1) = 1./error_array_Y(j)*sin(sigma*time(j))
       M(s,2) = 1./error_array_Y(j)*cos(sigma*time(j))
 
     end do

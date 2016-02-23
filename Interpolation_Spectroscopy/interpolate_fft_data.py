@@ -28,8 +28,10 @@ data[:,0]=data[:,0]-data[0,0]
 dX_array=data[:,1] 
 dY_array=data[:,2]
 
+
 dX_array = dX_array - np.average(dX_array)
 dY_array = dY_array - np.average(dY_array)
+
 dX_clean = dX_clean - np.average(dX_clean)
 dY_clean = dY_clean - np.average(dY_clean)
 
@@ -42,6 +44,7 @@ data_time=data[:,0]
 sample_step=15 #days
 
 #interpolation of the data
+print "data interpolation"
 interpolated_time_X,interpolated_dX=intp.interpolation_function(data_time,dX_array,dX_sigma,interp_time_step=sample_step)
 interpolated_time_Y,interpolated_dY=intp.interpolation_function(data_time,dY_array,dY_sigma,interp_time_step=sample_step)
 
@@ -61,6 +64,7 @@ interpolated_time_Y_clean=interpolated_time_Y_clean[:]-interpolated_time_Y_clean
 
 
 #fft processing
+print "fft processing"
 frequence_X,spectral_X=ft.processing_fft(interpolated_time_X,interpolated_dX,sample_step)
 frequence_Y,spectral_Y=ft.processing_fft(interpolated_time_Y,interpolated_dY,sample_step)
 
@@ -72,6 +76,7 @@ frequence_Y_clean,spectral_Y_clean=ft.processing_fft(interpolated_time_Y_clean,i
 ################
 #ploting script#
 ################
+print "plot generation"
 plt.figure(1)
 sub1 = plt.subplot(211)
 sub2 = plt.subplot(212)
@@ -79,17 +84,22 @@ sub2 = plt.subplot(212)
 xmin=0.
 xmax=500.
 
-sub1.plot(1./frequence_X,spectral_X,'r-')
+# sub1.plot(interpolated_time_X,interpolated_dX,'r-',label='donnee originelles')
+# sub1.plot(interpolated_time_X_clean,interpolated_dX,'b-',label='donnees nettoyees')
+sub1.plot(1./frequence_X,spectral_X,'r-',label='donnee originelles')
+sub1.plot(1/frequence_X_clean,spectral_X_clean,'b-',label='donnees nettoyees')
 sub1.set_title('Nutation dX')
-# sub1.set_xlabel('jour')
 sub1.set_ylabel('puissance spectrale normalisee')
 sub1.set_xlim(xmin,xmax)
+sub1.legend(loc='best')
 
-sub2.plot(1./frequence_Y,spectral_Y,'r-')
+sub2.plot(1./frequence_Y,spectral_Y,'r-',label='donnees originelles')
+sub2.plot(1/frequence_Y_clean,spectral_Y_clean,'b-',label='donnees nettoyees')
 sub2.set_title('Nutation dY')
 sub2.set_xlabel('jour')
 sub2.set_ylabel('puissance spectrale normalisee')
 sub2.set_xlim(xmin,xmax)
+sub2.legend(loc='best')
 
 
 plt.savefig('frequence_nutation.pdf')
