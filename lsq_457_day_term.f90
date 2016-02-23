@@ -10,12 +10,14 @@ program lsq_457_days
 
 
   integer,parameter        :: Nbr_of_point=5981,Nbr_of_parameter=1
-  real (kind=xi),parameter :: period=457._xi!days period wich we want to fit the complex amplitude
+  real (kind=xi),parameter :: period=-457._xi!days period wich we want to fit the complex amplitude
   real (kind=xi),parameter :: time_step =365.
   real (kind=xi),parameter :: Slide_Window = 2.*365. !days, it is the windows where we process the amplitude
+  real (kind=xi)           :: pulsation = 2._xi*pi/period
 
   real(kind=xi), dimension(Nbr_of_point) :: t, dX, dY, errdX, errdY, corrdXdY !parameter of observed nutation
   real(kind=xi), dimension(Nbr_of_point) :: X_457,Y_457 
+  real(kind=xi), dimension(Nbr_of_point) :: Re_457_ampl,Im_457_ampl 
   real(kind=xi), dimension(Nbr_of_point) :: dX_clean, dY_clean
 
   complex(kind=xi),dimension(:),allocatable :: amplitude !amplitude of the terme at 457days 
@@ -187,7 +189,7 @@ program lsq_457_days
   if (ios /= 0) stop "error in opening interpolated_457d_amps.dat"
   
   do i = 1,Nbr_of_point,1
-    read(11,*) X_457(i),Y_457(i)
+    read(11,*) Re_457_ampl(i),Im_457_ampl(i)
   end do
 
   close(11)
@@ -196,9 +198,9 @@ program lsq_457_days
   call system('rm interpolated_457d_amps.dat')
 
   !erasing the 457 days signal off the observe nutation
-  dX_clean=dX-X_457
-  dY_clean=dY-Y_457
-  !----------------------------------------------------
+  dX_clean = dX - Re_457_ampl * cos (pulsation * t) + Im_457_ampl * sin (pulsation * t)
+  dY_clean = dY - Re_457_ampl * sin (pulsation * t) - Im_457_ampl * cos (pulsation * t)
+  !!----------------------------------------------------
 
   open(13,file='data_clean_off_457.dat',status='replace',&
     action='write',iostat=ios)
