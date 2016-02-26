@@ -215,7 +215,7 @@ program lsq_457_days
 
   close(13)
 
-  open(14, file='free_movment.dat', status ='replace',&
+  open(14, file='free_movement.dat', status ='replace',&
     action='write')
   write(14,fmt='(3A26)')"#time", "Freemvt_x", "Freemvt_y"
 
