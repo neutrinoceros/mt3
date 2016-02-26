@@ -5,7 +5,7 @@ reset
 set terminal pdf color
 set output "pictures/amplitude_freq.pdf"
 set nokey
-set multiplot title "The Change of Amplitude dX and dY"
+set multiplot 
 set size 0.5, 0.9
 
 #Variable declaration
