@@ -1,4 +1,4 @@
-#Plot fitting amplitude between series - MHB and Observation
+#Plot fitting amplitude between series and Observation
 
 reset
 set terminal pdf color
@@ -16,7 +16,7 @@ ymax =  60
 
 #Plotting dX
 set origin 0.0,0.5
-set title "Comparision between the observation and the series"
+set notitle
 set xrange [xmin:xmax]
 set yrange [ymin:ymax]
 set noxlabel
