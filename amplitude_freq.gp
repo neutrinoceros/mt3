@@ -6,31 +6,31 @@ set terminal pdf color
 set output "pictures/amplitude_freq.pdf"
 set nokey
 set multiplot 
-set size 0.5, 0.9
+set size 1.0, 0.5
 
 #Variable declaration
 data = 'amplitude.dat'
-xmin = -10000
-xmax =  10000
-ymin = -0.05
-ymax =  0.04
+#xmin = -10000
+#xmax =  10000
+#ymin = -0.05
+#ymax =  0.04
 
 #Plotting in dX amplitude
-set origin 0.5, 0.02
-set xrange [xmin:xmax]
-set yrange [ymin:ymax]
+set origin 0.0,0.5
+#set xrange [xmin:xmax]
+#set yrange [ymin:ymax]
 set noxlabel
-set xlabel "Frequency (rad/JC)"
+set xlabel "f (rad/JC)"
 set ylabel "dX (mas)"
-plot data u 5:1:3 w errorb pt 7 ps 0.1
+plot data u 5:1 w p pt 7 ps 0.3
 
 #Plotting in dY amplitude
-set origin 0.0, 0.02
+set origin 0.0, 0.0
 set notitle
-set xrange [xmin:xmax]
-set yrange [ymin:ymax]
-set xlabel "Frequency (rad/JC)"
+#set xrange [xmin:xmax]
+#set yrange [ymin:ymax]
+set xlabel "f (rad/JC)"
 set ylabel "dY (mas)"
-plot data u 5:2:4 w errorb pt 7 ps 0.1
+plot data u 5:2 w p pt 7 ps 0.3
 
 unset multiplot

@@ -28,7 +28,7 @@ set origin 0.0,0.0
 set notitle
 set xrange [xmin:xmax]
 set yrange [ymin:ymax]
-set xlabel "time (JC)"
+set xlabel "t (JC)"
 set ylabel "dY (mas)"
 plot datafile u 5:4 w l, datafile u 5:2 w l
 unset multiplot
