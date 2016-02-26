@@ -205,7 +205,7 @@ program lsq_457_days
   open(13,file='data_clean_off_457.dat',status='replace',&
     action='write',iostat=ios)
   if(ios /=0) stop "pb ouverture data_clean_off_457.dat"
-  write(13,fmt='(3a26)')"#time","dx","dY"
+  write(13,fmt='(5a26)')"#time","dx","dY", "errdX", "errdY"
   do i = 1,Nbr_of_point,1
     write(13,fmt='(5e26.16)') t(i), dX_clean(i), dY_clean(i), errdX(i), errdY(i)
   end do
