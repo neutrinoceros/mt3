@@ -39,9 +39,10 @@ program lsq
   real(kind=xi), dimension(2*Nbr_of_point,2*Nbr_of_parameter + 4) :: M             !matrix like dXdY = M Ampl
   real(kind=xi), dimension(2*Nbr_of_parameter + 4,2*Nbr_of_parameter + 4) :: MM, P !MM is equal to tranpose(M) matrix product M
   real(kind=xi), dimension(2*Nbr_of_parameter + 4,2*Nbr_of_point) :: Q, MMM
-  real(kind=xi), dimension(2*Nbr_of_parameter + 4) :: Ampl                         !complex amplitude that we need to adjust
-  real(kind=xi), dimension(2*Nbr_of_point) :: M_dot_amp, tmpMa !matrix to compute the error
-  real(kind=xi) ::sigma_lsq ! residu
+  real(kind=xi), dimension(2*Nbr_of_parameter + 4) :: Ampl                        ! complex amplitude that we need to adjust
+  real(kind=xi), dimension(2*Nbr_of_point) :: M_dot_amp, tmpMa                    ! matrix to compute the error
+  real(kind=xi), dimension(2*Nbr_of_parameter + 4,2*Nbr_of_parameter + 4) :: corr ! Matrix off correlation
+  real(kind=xi) ::sigma_lsq                                                       ! residu
 
 
   real(kind=xi), dimension(Nbr_of_parameter) :: A, B
@@ -157,6 +158,26 @@ program lsq
     write(12,fmt='(5 E26.16)') A(i), B(i), errA(i), errB(i),sigma(i)
   end do
   close(unit=12)
+
+  !Processing the correlation of the different fiting amplitude
+  do j = 1, 2*Nbr_of_parameter+4, 1
+    do i =1, 2*Nbr_of_parameter+4, 1
+      corr(i,j) = abs( MM(i,j) / sqrt(MM(i,i) * MM(j,j)) )
+    end do
+  end do
+
+  open(unit=13, file='fit_amplitude_correlation.dat', status='replace',&
+    action='write')
+
+  write(carc,*) 2*Nbr_of_parameter+4
+  carc='('//trim(adjustl(carc))//'E26.16)'!edison of the output format
+  ! print*,carc
+
+  do i = 1, 2*Nbr_of_parameter+4, 1
+    write(13,fmt=trim(adjustl(carc))) corr(i,:)
+  end do
+  close(unit=13)
+
 
 ! Calculate the value of the X and Y from series and MHB 
   open (unit=13,file="series.dat",status="replace")
