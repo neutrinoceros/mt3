@@ -3,7 +3,7 @@ FLAGS = -g -O0 -fcheck=all -fbackslash
 LFLAG = -llapack -lblas 
 #FLAGS = -g -O2 -Wall -Wextra -fcheck=all -fbackslash
 
-all : lsq lsq_457
+all : lsq_457 lsq 
 
 lsq : mod_matrix.o arg_nut.o mod_series.o lsq.f90 
 	$(FC) $(FLAGS) $^ -o lsq.exe $(LFLAG)
@@ -23,9 +23,9 @@ mod_series.o : mod_series.f90
 mod_lsq.o : mod_lsq.f90
 	$(FC) -c $^
 
-run: lsq lsq_457
-	./lsq.exe
+run: lsq_457 lsq
 	./lsq_457.exe
+	./lsq.exe
 
 ###
 clean :
