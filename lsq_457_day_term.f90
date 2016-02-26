@@ -19,6 +19,7 @@ program lsq_457_days
   real(kind=xi), dimension(Nbr_of_point) :: X_457,Y_457 
   real(kind=xi), dimension(Nbr_of_point) :: Re_457_ampl,Im_457_ampl 
   real(kind=xi), dimension(Nbr_of_point) :: dX_clean, dY_clean
+  real(kind=xi), dimension(Nbr_of_point) :: Freemvt_X,Freemvt_Y
 
   complex(kind=xi),dimension(:),allocatable :: amplitude !amplitude of the terme at 457days 
   complex(kind=xi),dimension(:),allocatable :: err_ampl ! contains the error in the lsq processing x=real, y=im
@@ -198,18 +199,30 @@ program lsq_457_days
   call system('rm interpolated_457d_amps.dat')
 
   !erasing the 457 days signal off the observe nutation
-  dX_clean = dX - Re_457_ampl * cos (pulsation * t) + Im_457_ampl * sin (pulsation * t)
-  dY_clean = dY - Re_457_ampl * sin (pulsation * t) - Im_457_ampl * cos (pulsation * t)
+  Freemvt_X = Re_457_ampl * cos (pulsation * t) - Im_457_ampl * sin (pulsation * t)
+  Freemvt_Y = Re_457_ampl * sin (pulsation * t) + Im_457_ampl * cos (pulsation * t)
+  dX_clean = dX - Freemvt_X 
+  dY_clean = dY - Freemvt_Y
   !!----------------------------------------------------
 
   open(13,file='data_clean_off_457.dat',status='replace',&
     action='write',iostat=ios)
   if(ios /=0) stop "pb ouverture data_clean_off_457.dat"
-  write(13,fmt='(3a26)')"#time","dx","dY"
+  write(13,fmt='(5a26)')"#time","dx","dY", "errdX", "errdY"
   do i = 1,Nbr_of_point,1
     write(13,fmt='(5e26.16)') t(i), dX_clean(i), dY_clean(i), errdX(i), errdY(i)
   end do
 
   close(13)
+
+  open(14, file='free_mouvment.dat', status ='replace',&
+    action='write')
+  write(14,fmt='(3A26)')"#time", "Freemvt_x", "Freemvt_y"
+
+  do i = 1,Nbr_of_point,1
+    write(14,fmt='(3E26.16)') t(i),Freemvt_x(i),Freemvt_y(i)
+  end do
+
+  close(14)
 
 end program lsq_457_days
