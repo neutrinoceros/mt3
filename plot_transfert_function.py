@@ -23,6 +23,8 @@ import numpy.linalg as la
 
 from transfert import *
 
+LW    = 1.5
+ALPHA = 0.7
 #data loading
 #======================================================================
 ondes_tab = np.loadtxt("data/ondes.txt",comments='%',usecols=range(16,20))
@@ -40,12 +42,12 @@ sigs = corrs_tab[:,2]
 #resol obs = M*p1 (find p1)
 #======================================================================
 
-obs = transfert - th_T(sigs)
-M = np.zeros((len(obs),4))
+obs    = transfert - th_T(sigs)
+M      = np.zeros((len(obs),4))
 M[:,0] = dTkappa(sigs)
-M[:,1] = dTsigCW(sigs)
+M[:,1] = dTgamma(sigs)
 M[:,2] = dTe(sigs)
-M[:,3] = dTsigNDFW(sigs)
+M[:,3] = dTefb(sigs)
 
 p1 = la.lstsq(M,obs)[0]
 print p1
@@ -70,11 +72,17 @@ phi_pf       = argument(transfert_pf)
 #plot script
 #======================================================================
 
-fig,axes = pl.subplots(nrows=2)
 
+fig,axes = pl.subplots(nrows=2,sharex=True,squeeze=True)
+pl.subplots_adjust(hspace=.001,bottom=.1)
+for ax in axes :
+    ax.xaxis.set_tick_params(width=1.3)
+    ax.yaxis.set_tick_params(width=1.3)
+
+axes[0].set_xlim(sigMIN,sigMAX)
 axes[1].set_xlabel(r"$\sigma$",size=20)
-axes[1].set_ylabel(r"$\phi$"  ,size=20)
-axes[0].set_ylabel(r"$r$"     ,size=20)
+axes[1].set_ylabel(r"arg$(T)$",size=20)
+axes[0].set_ylabel(r"$|T|$"   ,size=20)
 axes[0].set_ylim(0,2)
 
 pl.ion()
@@ -82,15 +90,15 @@ pl.show()
 
 #calculated tranfert function
 #----------------------------------------
-axes[0].scatter(sigs,mod,marker="+")
-axes[1].scatter(sigs,phi,marker='+',color='r')
+axes[0].scatter(sigs,mod,marker="+",s=50,lw=1.3)
+axes[1].scatter(sigs,phi,marker="+",s=50,lw=1.3)
 
 #theoretical tranfert function
 #----------------------------------------
-axes[0].plot(sigs_th,mod_th,color='m')
-axes[0].plot(sigs_th,mod_pf,color='g')
+axes[0].plot(sigs_th,mod_th,color='m',lw=LW,alpha=ALPHA,label='a priori')
+axes[0].plot(sigs_th,mod_pf,color='r',lw=LW,alpha=ALPHA,label='post-fit')
 #axes[1].plot(sigs_th,phi_th,marker="*",color='m')   #useless : th_T returns reals, not complexs
-axes[1].plot(sigs_th,phi_pf,color='g')   
+axes[1].plot(sigs_th,phi_pf,color='r',lw=LW,alpha=ALPHA)   
 
 #theoretical asymptotes
 #----------------------------------------
@@ -100,6 +108,7 @@ axes[1].plot(sigs_th,phi_pf,color='g')
 #xxx = np.arange(min(sigs),max(sigs))
 #axes[0].plot(xxx,(Am*sigCW/(A*eR*Om))*np.ones(len(xxx)), ls='--',c='k')
 
+axes[0].legend()
 pl.draw()
 pl.ioff()
 
