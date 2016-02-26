@@ -39,29 +39,34 @@ Af    = 9.0583e37
 
 #ellipticities
 e     = 3.257e-3
+ef    = 2.547e-3
 
 #Compliances
 kappa = 1.039e-3
 gamma = 1.965e-3
-
+beta  = 6.160e-4
 
 #other numerical values 
 #-------------------------------------------------------------------
 sigCW   =  1.816829e-7 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 sigNDFW = -7.308004e-5 * d2s * jc2d #(rad.s^-1) ---> (rad.jc^-1)
 
-
+efb     = ef - beta #home made variable
 
 #theoretical transfert function
 #--------------------------------------------------
 def th_T(sig0,p1=np.zeros(4)) :
     """defined as eq 54 in "Drilling to the center of the Earth with VLBI" """
     sig = sig0 - Om
+    kkappa = kappa + p1[0]
+    ggamma = gamma + p1[1]
+    ee     = e     + p1[2]
+    eefb   = efb   + p1[3]
     res = - (sig-eR*Om)/(eR*Om) * (
-                                   ((kappa+p1[0]) - Af/A * gamma) 
-                                   - Am/A * (sigCW+p1[1])/(sig - (sigCW+p1[1]))
-                                   + Af/A * ((e+p1[2]) - gamma) * ((sigNDFW+p1[3]) + Om)/(sig - (sigNDFW+p1[3]))
-                                   )
+                                   kkappa - Af/A * ggamma
+                                   - Om*(ee - kkappa) / (sig - A/Am *Om*(ee - kkappa))
+                                   - Af/Am * Om * (ee - ggamma) * eefb / (sig + Om *(1. + A/Am * eefb))
+    )
     return res
 
 
@@ -70,21 +75,30 @@ def th_T(sig0,p1=np.zeros(4)) :
 
 def dTkappa(sig0) :
     sig = sig0 - Om
-    res = - (sig-eR*Om)/(eR*Om)
+    res = (eR*Om-sig)/(eR*Om) * (1. 
+                                 + Om/(sig-Om*(e-kappa))
+                                 + Om**2*(e-kappa)/(sig-Om*(e-kappa))**2
+    )
     return res
 
-def dTsigCW(sig0) :
+def dTgamma(sig0) :
     sig = sig0 - Om
-    res = (sig-eR*Om)/(eR*Om) * Am/A * sig/(sig - sigCW)**2
+    res = (eR*Om-sig)/(eR*Om) * ( - Af/A 
+                                  + Af/Am * Om*efb/(sig + Om*(1. + A/Am*efb))
+    )
     return res
 
 def dTe(sig0) :
     sig = sig0 - Om
-    res = - (sig-eR*Om)/(eR*Om) * Af/A * (sigNDFW + Om)/(sig - sigNDFW)
+    res = (eR*Om - sig)/(eR*Om) * ( - Om/(sig-Om*(e-kappa)) 
+                                    - Om**2*(e-kappa)/(sig-Om*(e-kappa))**2 
+                                    - Af/Am * Om*efb/(sig+Om*(1. + A/Am*efb))
+    )
     return res
 
-def dTsigNDFW(sig0) :
+def dTefb(sig0) :
     sig = sig0 - Om
-    res = - (sig-eR*Om)/(eR*Om) * Af/A * (e - gamma) * (sig)/(sig - sigNDFW)**2
+    res = (eR*Om-sig)/(eR*Om) * ( -Af/Am * Om*(e-gamma)/(sig+Om*(1. + A/Am *efb))
+                                  + A*Af/Am**2 * Om**2*(e-gamma)*efb / (sig + Om *(1. + A/Am*efb))**2
+    )
     return res
-
