@@ -13,5 +13,5 @@ plt.xticks(axenumx,axelegendx)
 plt.yticks(axenumy,axelegendy)
 plt.colorbar()
 
-plt.savefig('pictures/fit_amplitude_correlation.pdf')
+plt.savefig('pictures/fit_amplitude_correlation.pdf',tranparent=True)
 # plt.show()
