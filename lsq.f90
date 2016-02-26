@@ -66,21 +66,15 @@ program lsq
   close(15)
 
 !Read "opa2015a.eops" data  
-  ! open (unit=10, file="data/opa2015a.eops", status='old')
-  open (unit=12, file="data_clean_off_457.dat",status='old',&
-    action='read')
-  ! do k=1,38
-  !   read(10,*)
-  ! end do
-
-  read(12,*)!reading of the header line 
+  open (unit=10, file="data/opa2015a.eops", status='old')
+  do k=1,38
+    read(10,*)
+  end do
   do j=1,Nbr_of_point
-    ! read (10,*) t(j), var, var, var, dX(j), dY(j), var, var, &
-    !      carc, errdX(j), errdY(j), carc, var, var, var, corrdXdY(j), &
-    !      var, carc, var, var, var, var, var, var, var, var, &
-    !      var, var, var, var, carc
-
-    read(12,*)t(j),dX(j),dY(j),errdX(j),errdY(j)
+    read (10,*) t(j), var, var, var, dX(j), dY(j), var, var, &
+         carc, errdX(j), errdY(j), carc, var, var, var, corrdXdY(j), &
+         var, carc, var, var, var, var, var, var, var, var, &
+         var, var, var, var, carc
     
     !some data have 0.000 as error that meen tha the value is not true
     !we change this error in 100000. to kill this point
@@ -92,7 +86,7 @@ program lsq
     end if
 
   end do
-  ! close(10)
+  close(10)
 
   !computation of the observationnal array
   dXdY(:Nbr_of_point)=dX/errdX
