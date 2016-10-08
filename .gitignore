@@ -3,6 +3,7 @@
 *.py~
 *#
 *.dat
+*.pdf
 
 # Compiled Object files
 *.slo

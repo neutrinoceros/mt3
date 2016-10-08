@@ -36,7 +36,7 @@ transfert = np.array(etaC/etaR)
 
 mod  = module(transfert)
 phi  = argument(transfert)
-sigs = corrs_tab[:,2]
+sigs = corrs_tab[:,-1]
 
 
 #resol obs = M*p1 (find p1)
@@ -50,7 +50,11 @@ M[:,2] = dTe(sigs)
 M[:,3] = dTefb(sigs)
 
 p1 = la.lstsq(M,obs)[0]
+
+apriori = np.array([kappa,gamma,e,efb])
 print p1
+print apriori
+print np.real(np.sqrt(p1*np.conj(p1))/apriori)
 
 #def of theoretical values 
 #----------------------------------------
@@ -80,7 +84,7 @@ for ax in axes :
     ax.yaxis.set_tick_params(width=1.3)
 
 axes[0].set_xlim(sigMIN,sigMAX)
-axes[1].set_xlabel(r"$\sigma$",size=20)
+axes[1].set_xlabel(r"$\sigma$[siecle$^{-1}$]",size=20)
 axes[1].set_ylabel(r"arg$(T)$",size=20)
 axes[0].set_ylabel(r"$|T|$"   ,size=20)
 axes[0].set_ylim(0,2)
@@ -90,15 +94,17 @@ pl.show()
 
 #calculated tranfert function
 #----------------------------------------
+
 axes[0].scatter(sigs,mod,marker="+",s=50,lw=1.3)
 axes[1].scatter(sigs,phi,marker="+",s=50,lw=1.3)
 
 #theoretical tranfert function
 #----------------------------------------
-axes[0].plot(sigs_th,mod_th,color='m',lw=LW,alpha=ALPHA,label='a priori')
-axes[0].plot(sigs_th,mod_pf,color='r',lw=LW,alpha=ALPHA,label='post-fit')
+
+axes[0].plot(sigs_th,mod_th,color='darkcyan',lw=LW,alpha=ALPHA,label='a priori')
+axes[0].plot(sigs_th,mod_pf,color='crimson',lw=LW,alpha=ALPHA,label='post-fit')
 #axes[1].plot(sigs_th,phi_th,marker="*",color='m')   #useless : th_T returns reals, not complexs
-axes[1].plot(sigs_th,phi_pf,color='r',lw=LW,alpha=ALPHA)   
+axes[1].plot(sigs_th,phi_pf,color='crimson',lw=LW,alpha=ALPHA)   
 
 #theoretical asymptotes
 #----------------------------------------
@@ -112,4 +118,5 @@ axes[0].legend()
 pl.draw()
 pl.ioff()
 
+pl.savefig('pictures/fit_transfert.pdf',transparent=True)
 raw_input()
